@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Lock Selection for {{ customer.name }}</h2>
+    
+    {% if customer.lock %}
+    <div class="alert alert-info mb-4">
+        You are updating the lock selection.
+    </div>
+    {% endif %}
+
+    <div class="card border-primary">
+        <div class="card-header bg-primary text-white">
+            Lock Options
+        </div>
+        <div class="card-body">
+            <form method="post" class="form-horizontal">
+                {% csrf_token %}
+                {% for field in form %}
+                <div class="form-group row">
+                    <label for="{{ field.id_for_label }}" class="col-sm-3 col-form-label">{{ field.label }}</label>
+                    <div class="col-sm-9">
+                        {{ field }}
+                        {% if field.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ field.errors|first }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                <div class="form-group row">
+                    <div class="col-sm-9 offset-sm-3">
+                        <button type="submit" class="btn btn-primary">Update Lock</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const typeSelect = document.getElementById("id_type");
+        const subTypeSelect = document.getElementById("id_sub_type");
+    
+        const roundSubtypes = JSON.parse('{{ round_subtypes|escapejs }}');
+        const latchSubtypes = JSON.parse('{{ latch_subtypes|escapejs }}');
+        const motislockSubtypes = JSON.parse('{{ motislock_subtypes|escapejs }}');
+
+        function setSubtypeOptions(options) {
+            subTypeSelect.innerHTML = '';
+            options.forEach(option => {
+                const opt = document.createElement("option");
+                opt.value = option[0];
+                opt.textContent = option[1];
+                subTypeSelect.appendChild(opt);
+            });
+            
+            if (subTypeSelect.options.length > 0) {
+                subTypeSelect.value = subTypeSelect.options[0].value;
+            }
+        }
+    
+        typeSelect.addEventListener("change", function() {
+            if (typeSelect.value === "Round") {
+                setSubtypeOptions(roundSubtypes);
+            } else if (typeSelect.value === "Latch") {
+                setSubtypeOptions(latchSubtypes);
+            } else if (typeSelect.value === "Motislock") {
+                setSubtypeOptions(motislockSubtypes);
+            } else if (typeSelect.value === "ALLdroplock") {
+                setSubtypeOptions([]);
+            }
+        });
+    });
+</script>
+    
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2 class="mt-5 text-center">Processes for {{ customer.name }}</h2>
+
+<div class="row mt-5">
+    <!-- Measurement Card -->
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                    <h5 class="card-title">
+                        <span class="{{ customer.is_measurement_completed|yesno:'text-success,text-danger' }}">&#9679;</span> 
+                        Measurement
+                        <!-- This will render a colored dot -->
+                    </h5>
+                <p class="card-text">Top, Bottom, and Height measurements.</p>
+                <a href="{% url 'measurement' customer.id %}" class="btn btn-primary">Go</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><span class="{{ customer.is_measurement_completed|yesno:'text-success,text-danger' }}">&#9679;</span> Hinges</h5>
+                <p class="card-text">Select the type of Hinges here</p>
+                <a href="{% url 'select_hinge' customer.id %}" class="btn btn-primary">Go</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><span class="{{ customer.is_measurement_completed|yesno:'text-success,text-danger' }}">&#9679;</span> Locks</h5>
+                <p class="card-text">Select the type of Lock</p>
+                <a href="{% url 'lock_selection' customer.id %}" class="btn btn-primary">Go</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><span class="{{ customer.is_measurement_completed|yesno:'text-success,text-danger' }}">&#9679;</span> Finish</h5>
+                <p class="card-text">Select the Finish for Front and Back</p>
+                <a href="{% url 'finish_selection' customer.id %}" class="btn btn-primary">Go</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><span class="{{ customer.is_measurement_completed|yesno:'text-success,text-danger' }}">&#9679;</span> Door Open</h5>
+                <p class="card-text">Select the Direction for Door opening</p>
+                <a href="{% url 'door_open_selection' customer.id %}" class="btn btn-primary">Go</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><span class="{{ customer.is_measurement_completed|yesno:'text-success,text-danger' }}">&#9679;</span> Frame Selection</h5>
+                <p class="card-text">Select Frame Size</p>
+                <a href="{% url 'frame_selection' customer.id %}" class="btn btn-primary">Go</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Advance Payment</h5>
+                <p class="card-text">Add advance payment of customer if any </p>
+                <a href="{% url 'update_advance_payment' customer.id %}" class="btn btn-primary">Go</a>
+            </div>
+        </div>
+    </div>
+    <!-- Other cards can follow in a similar fashion -->
+</div>
+{% endblock %}

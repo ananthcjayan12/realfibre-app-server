@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center">Welcome, {{ request.user.username }}</h1>
+
+    <div class="card mt-4">
+        <div class="card-header">Search Customers</div>
+        <div class="card-body">
+            <form method="get" class="form-inline">
+                <input type="text" name="search" class="form-control mr-2" placeholder="Search customer...">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Existing Customers -->
+    <div class="mt-5 card">
+        <div class="card-header">Existing Customers</div>
+        <ul class="list-group list-group-flush">
+            {% for customer in customers %}
+            <li class="list-group-item">
+                {{ customer.name }} - {{ customer.location }}
+                <a href="{% url 'process_selection' customer.id %}" class="btn btn-primary btn-sm float-right">Select</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    
+
+    <!-- Add New Customer -->
+    <div class="card mt-4">
+        <div class="card-header">Add New Customer</div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <!-- Name Field -->
+                <div class="form-group">
+                    <label for="{{ form.name.id_for_label }}">Name:</label>
+                    <input type="text" class="form-control" id="{{ form.name.id_for_label }}" name="{{ form.name.name }}" placeholder="Enter name">
+                </div>
+
+                <!-- Location Field -->
+                <div class="form-group">
+                    <label for="{{ form.location.id_for_label }}">Location:</label>
+                    <input type="text" class="form-control" id="{{ form.location.id_for_label }}" name="{{ form.location.name }}" placeholder="Enter location">
+                </div>
+
+                <input type="submit" value="Create" class="btn btn-success">
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

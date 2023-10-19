@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Hinge Selection for {{ customer.name }}</h2>
+    
+    {% if hinge_instance.pk %}
+    <div class="alert alert-info mb-4">
+        You are updating the hinge selection.
+    </div>
+    {% endif %}
+
+    <div class="card border-primary">
+        <div class="card-header bg-primary text-white">
+            Hinge Options
+        </div>
+        <div class="card-body">
+            <form method="post" class="form-horizontal">
+                {% csrf_token %}
+                {% for field in form %}
+                <div class="form-group row">
+                    <label for="{{ field.id_for_label }}" class="col-sm-3 col-form-label">{{ field.label }}</label>
+                    <div class="col-sm-9">
+                        {{ field }}
+                        {% if field.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ field.errors|first }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                <div class="form-group row">
+                    <div class="col-sm-9 offset-sm-3">
+                        <button type="submit" class="btn btn-primary">Update Hinge</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
