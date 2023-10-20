@@ -35,22 +35,35 @@
         <div class="card-body">
             <form method="post">
                 {% csrf_token %}
-                
+    
                 <!-- Name Field -->
                 <div class="form-group">
                     <label for="{{ form.name.id_for_label }}">Name:</label>
                     <input type="text" class="form-control" id="{{ form.name.id_for_label }}" name="{{ form.name.name }}" placeholder="Enter name">
                 </div>
-
+    
                 <!-- Location Field -->
                 <div class="form-group">
                     <label for="{{ form.location.id_for_label }}">Location:</label>
                     <input type="text" class="form-control" id="{{ form.location.id_for_label }}" name="{{ form.location.name }}" placeholder="Enter location">
                 </div>
-
+    
+                <!-- Phone Number Field -->
+                <div class="form-group">
+                    <label for="{{ form.phone_number.id_for_label }}">Phone Number:</label>
+                    <input type="tel" class="form-control" id="{{ form.phone_number.id_for_label }}" name="{{ form.phone_number.name }}" placeholder="Enter phone number">
+                </div>
+    
+                <!-- Google Location Field (assuming it's a URL field) -->
+                <div class="form-group">
+                    <label for="{{ form.google_location.id_for_label }}">Google Location:</label>
+                    <input type="url" class="form-control" id="{{ form.google_location.id_for_label }}" name="{{ form.google_location.name }}" placeholder="Enter Google Maps link">
+                </div>
+    
                 <input type="submit" value="Create" class="btn btn-success">
             </form>
         </div>
     </div>
+    
 </div>
 {% endblock %}

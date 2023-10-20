@@ -10,7 +10,7 @@
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">
-                <span class="{{ customer.is_measurement_completed|yesno:'text-success,text-danger' }}">&#9679;</span> 
+                <span class="{{ doors.measurement|yesno:'text-success,text-danger' }}">&#9679;</span>
                 Measurement
             </h5>
             <p class="card-text">Top, Bottom, and Height measurements.</p>
@@ -23,7 +23,7 @@
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">
-                <span class="{{ customer.is_hinge_selected|yesno:'text-success,text-danger' }}">&#9679;</span>
+                <span class="{{ doors.hinge_selection|yesno:'text-success,text-danger' }}">&#9679;</span>
                 Hinges
             </h5>
             <p class="card-text">Select the type of Hinges here</p>
@@ -36,7 +36,7 @@
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">
-                <span class="{{ customer.is_lock_selected|yesno:'text-success,text-danger' }}">&#9679;</span>
+                <span class="{{ doors.lock_selection|yesno:'text-success,text-danger' }}">&#9679;</span>
                 Locks
             </h5>
             <p class="card-text">Select the type of Lock</p>
@@ -49,7 +49,7 @@
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">
-                <span class="{{ customer.is_finish_selected|yesno:'text-success,text-danger' }}">&#9679;</span>
+                <span class="{{ doors.finish_selection|yesno:'text-success,text-danger' }}">&#9679;</span>
                 Finish
             </h5>
             <p class="card-text">Select the Finish for Front and Back</p>
@@ -62,7 +62,7 @@
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">
-                <span class="{{ customer.is_doors_open_selected|yesno:'text-success,text-danger' }}">&#9679;</span>
+                <span class="{{ doors.door_open_selection|yesno:'text-success,text-danger' }}">&#9679;</span>
                 doors Open
             </h5>
             <p class="card-text">Select the Direction for doors opening</p>
@@ -75,7 +75,7 @@
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">
-                <span class="{{ customer.is_frame_selected|yesno:'text-success,text-danger' }}">&#9679;</span>
+                <span class="{{ doors.frame_selection|yesno:'text-success,text-danger' }}">&#9679;</span>
                 Frame Selection
             </h5>
             <p class="card-text">Select Frame Size</p>

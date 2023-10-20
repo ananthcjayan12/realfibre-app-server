@@ -2,11 +2,11 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="text-center mb-4">Lock Selection for {{ customer.name }}</h2>
+    <h2 class="text-center mb-4">Lock Selection for {{ door.name }}</h2>
     
-    {% if customer.lock %}
+    {% if door.lock %}
     <div class="alert alert-info mb-4">
-        You are updating the lock selection.
+        You are updating the lock selection for this door.
     </div>
     {% endif %}
 

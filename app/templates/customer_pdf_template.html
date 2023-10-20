@@ -1,0 +1,116 @@
+<html>
+<head>
+    <style>
+        /* Base Styles */
+        @page {
+            size: landscape;  /* Set page to landscape */
+            margin: 2cm;  /* Set uniform margin of 2cm on all sides */
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Header Styles */
+        .header {
+            border-bottom: 2px solid black;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+
+        /* Customer Details */
+        .customer-details {
+            margin-bottom: 30px;
+        }
+
+        .customer-details p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 10px 15px;
+            font-size: 12px;
+            word-wrap: break-word;  /* Ensures that the content fits inside the table */
+            max-width: 200px;  /* Set a max-width to ensure columns don't stretch too much */
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>REAL FIBRE DOOR</h1>
+    </div>
+
+    <div class="customer-details" style="display: flex; justify-content: space-between;">
+
+        <!-- Column 1 -->
+        <div style="flex: 1;">
+            <p><strong>Order No:</strong> {{ customer.order_no }}</p>
+            <p><strong>Customer:</strong> {{ customer.name }}</p>
+            <p><strong>Party Name:</strong> {{ customer.party_name }}</p>
+            <p><strong>Address:</strong> {{ customer.location}}</p>
+        </div>
+    
+        <!-- Column 2 -->
+        <div style="flex: 1;">
+            <p><strong>Phone Number:</strong> {{ customer.phone_number }}</p>
+            <p><strong>Order Date:</strong> {{ customer.order_date }}</p>
+            <p><strong>Delivery Date:</strong> {{ customer.delivery_date }}</p>
+        </div>
+    
+    </div>
+    
+
+    <table>
+        <!-- Table headers -->
+        <thead>
+            <tr>
+                <th>SL.No</th>
+                <th>Measurement</th>
+                <th>Hinge Selection</th>
+                <th>Lock Selection</th>
+                <th>Finish Selection</th>
+                <th>Door Open Selection</th>
+                <th>Frame Selection</th>
+            </tr>
+        </thead>
+        <!-- Table body with dynamic data -->
+        <tbody>
+            {% for door in customer.doors.all %}  <!-- Assuming a ForeignKey relationship from Door to Customer -->
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ door.measurement }}</td>
+                <td>{{ door.hinge_selection }}</td>
+                <td>{{ door.lock_selection }}</td>
+                <td>{{ door.finish_selection }}</td>
+                <td>{{ door.door_open_selection }}</td>
+                <td>{{ door.frame_selection }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <footer>
+        <p>Thank you for choosing Real Fibre Door. We value your business.</p>
+    </footer>
+</body>
+</html>

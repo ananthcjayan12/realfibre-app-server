@@ -4,8 +4,8 @@ from .models import Customer, Door, Measurement, Hinge, Lock, Finish, DoorOpen, 
 class CustomerForm(forms.ModelForm):
     class Meta:
         model = Customer
-        fields = ['name', 'location']
-
+        fields = ['name', 'location', 'phone_number', 'google_location']
+        
 class MeasurementForm(forms.ModelForm):
     class Meta:
         model = Measurement
@@ -71,8 +71,8 @@ class DoorOpenForm(forms.ModelForm):
 class FrameForm(forms.ModelForm):
     class Meta:
         model = Frame
-        fields = ['type', 'top_measurement', 'breadth_measurement', 'height_measurement']
-
+        fields = ['type']
+        
 class AdvancePaymentForm(forms.ModelForm):
     class Meta:
         model = Customer

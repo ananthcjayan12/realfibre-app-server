@@ -13,6 +13,12 @@ urlpatterns = [
     path('update_advance/<int:door_id>/', views.update_advance_payment, name='update_advance_payment'),
      path('customer/<int:customer_id>/doors/', views.door_selection, name='door_selection'),
     path('door/<int:door_id>/delete/', views.delete_door, name='delete_door'),
+    path('doors/pdf/<int:customer_id>/', views.door_pdf_view, name='door_pdf'),
+    path('update_customer_details/<int:customer_id>/', views.update_customer_details, name='update_customer_details'),
+    path('admin_dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('customer/<int:customer_id>/complete/', views.mark_as_complete, name='mark_as_complete'),
+    path('customer/<int:customer_id>/show_pdf/', views.show_pdf, name='show_pdf'),
+    path('customer/<int:customer_id>/update_balance/', views.update_balance, name='update_balance'),
 
     # ... other URL patterns ...
 
