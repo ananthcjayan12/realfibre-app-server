@@ -19,8 +19,9 @@ urlpatterns = [
     path('customer/<int:customer_id>/complete/', views.mark_as_complete, name='mark_as_complete'),
     path('customer/<int:customer_id>/show_pdf/', views.show_pdf, name='show_pdf'),
     path('customer/<int:customer_id>/update_balance/', views.update_balance, name='update_balance'),
-     path('login/', views.agent_login, name='agent_login'),
+     path('login/', views.CustomLoginView.as_view(), name='agent_login'),
     path('logout/', views.agent_logout, name='agent_logout'),
+    path('create_agent/', views.create_agent, name='create_agent'),
 
     # ... other URL patterns ...
 

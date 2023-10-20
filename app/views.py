@@ -1,11 +1,12 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import *
-from .forms import CustomerForm, MeasurementForm, HingeForm, LockForm, FinishForm, DoorOpenForm, FrameForm, AdvancePaymentForm,DoorForm
+from .forms import CustomerForm, MeasurementForm, HingeForm, LockForm, FinishForm, DoorOpenForm, FrameForm, AdvancePaymentForm,DoorForm ,AgentCreationForm
 from django.http import HttpResponseForbidden
 from django.contrib import messages
 import json
-
+from django.urls import reverse_lazy
+from django.contrib.auth.views import LoginView
 FRAME_ADJUSTMENTS = {
     'Small': (-7.3, -7.3, -4.3),
     'Normal': (-7.3, -7.3, -4.8),
@@ -15,6 +16,14 @@ FRAME_ADJUSTMENTS = {
     'Door With Clearence': (-0.7, -0.7, -0.8)
 }
 
+class CustomLoginView(LoginView):
+    template_name = 'login.html'
+    
+    def get_success_url(self):
+        if self.request.user.is_superuser:
+            return reverse_lazy('admin_dashboard')
+        return reverse_lazy('home')
+    
 @login_required
 def home(request):
     if request.method == 'POST':
@@ -393,3 +402,15 @@ def agent_login(request):
 def agent_logout(request):
     logout(request)
     return render(request, 'logout.html')
+
+def create_agent(request):
+    if not request.user.is_superuser:
+        return redirect('home')  # redirecting if not superuser
+    if request.method == "POST":
+        form = AgentCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('home')  # or wherever you'd like to redirect
+    else:
+        form = AgentCreationForm()
+    return render(request, 'create_agent.html', {'form': form})

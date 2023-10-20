@@ -4,10 +4,13 @@
 
 <div class="container-fluid">
     <!-- Main Header with a subtle background -->
-    <div class="row py-4 bg-light">
-        <div class="col-md-12">
+    <div class="row py-4 bg-light align-items-center"> <!-- Added align-items-center for vertical centering -->
+        <div class="col-md-9">
             <h2 class="mb-0">Admin Dashboard</h2>
             <small>Manage customer orders and balances</small>
+        </div>
+        <div class="col-md-3 text-right">
+            <a href="{% url 'create_agent' %}" class="btn btn-outline-dark">Add Agent</a>
         </div>
     </div>
 
