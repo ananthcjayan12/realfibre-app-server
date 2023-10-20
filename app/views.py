@@ -372,3 +372,24 @@ def update_balance(request, customer_id):
         # Logic to update balance amount goes here
         return redirect('admin_dashboard')
     return render(request, 'update_balance_template.html', {'customer': customer})
+
+from django.contrib.auth import authenticate, login,logout
+from django.shortcuts import render, redirect
+
+def agent_login(request):
+    if request.method == "POST":
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('home')  # Redirect to agent's dashboard after successful login
+        else:
+            messages.error(request, 'Invalid username or password.')
+    return render(request, 'login.html')
+
+
+
+def agent_logout(request):
+    logout(request)
+    return render(request, 'logout.html')
