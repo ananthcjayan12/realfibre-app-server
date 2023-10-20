@@ -1,59 +1,53 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="text-center mb-4">Doors for {{ customer.name }}</h2>
-    
+<div class="container-fluid p-3">
+
+    <h3 class="text-center mb-4">Doors for {{ customer.name }}</h3>
+
     <form method="post" action="{% url 'update_customer_details' customer.id %}">
         {% csrf_token %}
-        <div class="row">
-
-            <!-- Delivery Date Card -->
-            <div class="col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-header">
-                        Delivery Date
-                    </div>
-                    <div class="card-body">
-                        <label for="delivery_date">Set Delivery Date:</label>
-                         {{customer.delivery_date}}
-                        <input type="date" name="delivery_date" id="delivery_date" value="{{ formatted_date }}" class="form-control mb-2">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Advance Paid Card -->
-            <div class="col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-header">
-                        Advance Paid
-                    </div>
-                    <div class="card-body">
-                        <label for="advance_paid">Update Advance Paid ($):</label>
-                        <input type="number" name="advance_paid" id="advance_paid" step="0.01" value="{{ customer.advance_paid|default:'0.00' }}" class="form-control">
-                    </div>
-                </div>
-            </div>
-
-        </div> <!-- end of row -->
         
+        <!-- Delivery Date Card -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <i class="fa fa-calendar-alt"></i> Delivery Date
+            </div>
+            <div class="card-body">
+                <label for="delivery_date">Set Delivery Date:</label>
+                {{customer.delivery_date}}
+                <input type="date" name="delivery_date" id="delivery_date" value="{{ formatted_date }}" class="form-control mb-2">
+            </div>
+        </div>
+
+        <!-- Advance Paid Card -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <i class="fa fa-dollar-sign"></i> Advance Paid
+            </div>
+            <div class="card-body">
+                <label for="advance_paid">Update Advance Paid ($):</label>
+                <input type="number" name="advance_paid" id="advance_paid" step="0.01" value="{{ customer.advance_paid|default:'0.00' }}" class="form-control">
+            </div>
+        </div>
+
         <div class="text-center mb-3">
-            <button type="submit" class="btn btn-primary">Update Details</button>
+            <button type="submit" class="btn btn-primary btn-block">Update Details</button>
         </div>
     </form>
 
-    <div class="card mb-4">
+    <!-- Existing Doors Card -->
+    <div class="card mb-3">
         <div class="card-header">
-            Existing Doors
+            <i class="fa fa-door-open"></i> Existing Doors
         </div>
         <ul class="list-group list-group-flush">
             {% for door in doors %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 Door #{{ forloop.counter }}
-                <!-- Indicator Light -->
                 <span class="{{ door.is_all_processes_completed|yesno:'text-success,text-danger' }}">&#9679;</span>
                 <div>
-                    <a href="{% url 'process_selection' door.id %}" class="btn btn-primary btn-sm mr-2">View Processes</a>
+                    <a href="{% url 'process_selection' door.id %}" class="btn btn-primary btn-sm mr-2">View</a>
                     <a href="{% url 'delete_door' door.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this door?')">Remove</a>
                 </div>
             </li>
@@ -62,19 +56,14 @@
     </div>
 
     <div class="text-center mb-3">
-        <!-- Show PDF Button -->
-        <a href="{% url 'door_pdf' customer.id %}" class="btn btn-secondary">Show PDF</a>
+        <a href="{% url 'door_pdf' customer.id %}" class="btn btn-secondary btn-block">Show PDF <i class="fa fa-file-pdf"></i></a>
     </div>
 
-    <form method="post" class="text-center">
+    <form method="post" class="text-center mb-3">
         {% csrf_token %}
-        <div class="mb-3">
-            <button type="submit" class="btn btn-primary">Add New Door</button>
-        </div>
+        <button type="submit" class="btn btn-primary btn-block">Add New Door <i class="fa fa-plus"></i></button>
         {% if show_submit_order_button %}
-        <div>
-            <button type="submit" name="submit_order" class="btn btn-success">Submit Order</button>
-        </div>
+        <button type="submit" name="submit_order" class="btn btn-success btn-block">Submit Order <i class="fa fa-check"></i></button>
         {% endif %}
     </form>
 
