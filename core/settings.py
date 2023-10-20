@@ -26,6 +26,7 @@ SECRET_KEY = "django-insecure-xf7&gz7asn5s8%v$woe!pm3xmrv#%$bmxkqc5o%t15vzfu8lxy
 DEBUG = True
 
 ALLOWED_HOSTS = ['realfibreglass.srshti.co.in']
+CSRF_TRUSTED_ORIGINS = ['https://bradyurlqr.srshti.co.in']
 
 
 # Application definition
