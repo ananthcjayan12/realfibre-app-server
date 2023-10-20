@@ -21,7 +21,8 @@
             {% for customer in customers %}
             <li class="list-group-item">
                 {{ customer.name }} - {{ customer.location }}
-                <a href="{% url 'process_selection' customer.id %}" class="btn btn-primary btn-sm float-right">Select</a>
+                <!-- Changed the link to redirect to the door selection page -->
+                <a href="{% url 'door_selection' customer.id %}" class="btn btn-primary btn-sm float-right">Doors</a>
             </li>
             {% endfor %}
         </ul>

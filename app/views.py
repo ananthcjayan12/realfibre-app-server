@@ -1,8 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Customer
-from .forms import CustomerForm ,MeasurementForm,FinishForm,DoorOpenForm,AdvancePaymentForm
-from .models import Measurement,Hinge,Finish,DoorOpen
+from .models import *
+from .forms import CustomerForm, MeasurementForm, HingeForm, LockForm, FinishForm, DoorOpenForm, FrameForm, AdvancePaymentForm,DoorForm
 from django.http import HttpResponseForbidden
 from django.contrib import messages
 import json
@@ -33,208 +32,121 @@ def home(request):
 
     return render(request, 'home.html', {'customers': customers, 'form': form})
 
-@login_required
-def process_selection(request, customer_id):
+
+
+def door_selection(request, customer_id):
     customer = get_object_or_404(Customer, id=customer_id)
-    return render(request, 'process_selection.html', {'customer': customer})
-
-
-from .forms import MeasurementForm
-
-@login_required
-def measurement(request, customer_id):
-    customer = get_object_or_404(Customer, id=customer_id)
+    doors = Door.objects.filter(customer=customer).order_by('id')
     
-    try:
-        existing_measurement = Measurement.objects.get(customer=customer)
-    except Measurement.DoesNotExist:
-        existing_measurement = None
+    if request.method == "POST":
+        # Logic to create a new door
+        new_door = Door(customer=customer)
+        new_door.save()
+        # Redirect to the door selection page again to see the updated list
+        return redirect('door_selection', customer_id=customer_id)
+    
+    context = {
+        'customer': customer,
+        'doors': doors,
+    }
+    
+    return render(request, 'select_door.html', context)
 
+def delete_door(request, door_id):
+    door = get_object_or_404(Door, id=door_id)
+    customer_id = door.customer.id
+    door.delete()
+    return redirect('door_selection', customer_id=customer_id)
+
+def door_process(request, door_id):
+    door = get_object_or_404(Door, id=door_id)
+    
+    # If you want to process anything, you'll handle it here. Otherwise:
+    return render(request, 'door_process.html', {'door': door})
+
+
+
+@login_required
+def process_selection(request, door_id):
+    doors = get_object_or_404(Door, id=door_id)
+    return render(request, 'process_selection.html', {'doors': doors})
+
+@login_required
+def measurement(request, door_id):
+    door = get_object_or_404(Door, id=door_id)
+    existing_measurement = door.measurement
     if request.method == 'POST':
-        if existing_measurement:
-            form = MeasurementForm(request.POST, instance=existing_measurement)
-        else:
-            form = MeasurementForm(request.POST)
-        
+        form = MeasurementForm(request.POST, instance=existing_measurement)
         if form.is_valid():
             measurement = form.save(commit=False)
-            measurement.customer = customer
+            door.measurement = measurement
             measurement.save()
-            return redirect('process_selection', customer_id=customer.id)
+            door.save()
+            return redirect('process_selection', door_id=door.id)
     else:
-        if existing_measurement:
-            form = MeasurementForm(instance=existing_measurement)
-        else:
-            form = MeasurementForm()
+        form = MeasurementForm(instance=existing_measurement)
+        print(form.instance)
 
-    return render(request, 'measurement.html', {'customer': customer, 'form': form})
-
-from .forms import HingeForm
+    return render(request, 'measurement.html', {'door': door, 'form': form})
 
 @login_required
-def select_hinge(request, customer_id):
-    customer = get_object_or_404(Customer, id=customer_id)
-
-    # Ensure the customer belongs to the logged-in agent
-    if customer.agent != request.user:
-        return HttpResponseForbidden("You don't have permission to access this page.")
-
-    hinge_instance, created = Hinge.objects.get_or_create(customer=customer)
+def select_hinge(request, door_id):
+    door = get_object_or_404(Door, id=door_id)
+    hinge_instance = door.hinge_selection
 
     if request.method == 'POST':
         form = HingeForm(request.POST, instance=hinge_instance)
         if form.is_valid():
-            hinge = form.save()  # The instance is automatically saved or updated
-            return redirect('process_selection', customer_id=customer.id)
-
+            hinge = form.save(commit=False)
+            door.hinge_selection = hinge
+            hinge.save()
+            door.save()
+            return redirect('process_selection', door_id=door.id)
     else:
         form = HingeForm(instance=hinge_instance)
 
-    return render(request, 'select_hinge.html', {'customer': customer, 'form': form, 'hinge': hinge_instance})
-
-from django.shortcuts import render, redirect
-from .forms import LockForm
-from .models import Lock, Customer
-
-from django.shortcuts import render, redirect, get_object_or_404
+    return render(request, 'select_hinge.html', {'door': door, 'form': form})
 
 
-def lock_selection(request, customer_id):
-    customer = get_object_or_404(Customer, id=customer_id)
+@login_required
+def lock_selection(request, door_id):
+    door = get_object_or_404(Door, id=door_id)
+    lock_instance = door.lock_selection
 
     if request.method == "POST":
-        form = LockForm(request.POST, instance=customer.lock_set.first())
-        
+        form = LockForm(request.POST, instance=lock_instance)
         if form.is_valid():
-            lock_instance = form.save(commit=False)
-            lock_instance.customer = customer
-            lock_instance.save()
-            return redirect('process_selection', customer_id=customer.id)
-        else:
-            print(form.errors)
-
+            lock_obj = form.save(commit=False)
+            door.lock_selection = lock_obj
+            lock_obj.save()
+            door.save()
+            return redirect('process_selection', door_id=door.id)
     else:
-        form = LockForm(instance=customer.lock_set.first())
+        form = LockForm(instance=lock_instance)
 
-    context = {
-        'form': form,
-        'customer': customer,
-        'round_subtypes': json.dumps(LockForm.ROUND_SUBTYPES),
-        'latch_subtypes': json.dumps(LockForm.LATCH_SUBTYPES),
-        'motislock_subtypes': json.dumps(LockForm.MOTISLOCK_SUBTYPES)
-    }
+    return render(request, 'lock_selection.html', {'door': door, 'form': form})
 
-    return render(request, 'lock_selection.html', context)
-
-
-
-def finish_selection(request, customer_id):
+@login_required
+def finish_selection(request, customer_id, door_id):
     customer = get_object_or_404(Customer, id=customer_id)
-    
-    # Use related_name to get the Finish instance for the customer, if exists
-    finish_instance = Finish.objects.filter(customer=customer).first()
-    
-    if request.method == "POST":
-        form = FinishForm(request.POST, instance=finish_instance)
-
-        if form.is_valid():
-            new_finish = form.save(commit=False)
-            new_finish.customer = customer
-            new_finish.save()
-            return redirect('process_selection', customer_id=customer.id)
-        
-    else:
-        form = FinishForm(instance=finish_instance)
-
-    context = {
-        'form': form,
-        'customer': customer,
-        'finish_exists': bool(finish_instance)  # Returns True if finish_instance exists, otherwise False
-    }
-
-    return render(request, 'finish_selection.html', context)
-
-
-def door_open_selection(request, customer_id):
-    customer = get_object_or_404(Customer, id=customer_id)
-
-    # Check if the customer already has a DoorOpen selection
-    door_open_instance = DoorOpen.objects.filter(customer=customer).first()
+    door = get_object_or_404(Door, id=door_id)
+    existing_finish = Finish.objects.filter(door=door).first()
 
     if request.method == "POST":
-        form = DoorOpenForm(request.POST, instance=door_open_instance)
-
+        form = FinishForm(request.POST, instance=existing_finish)
         if form.is_valid():
-            door_open = form.save(commit=False)
-            door_open.customer = customer
-            door_open.save()
+            finish_instance = form.save(commit=False)
+            finish_instance.door = door
+            finish_instance.save()
             return redirect('process_selection', customer_id=customer.id)
     else:
-        form = DoorOpenForm(instance=door_open_instance)
+        form = FinishForm(instance=existing_finish)
 
-    context = {
-        'form': form,
-        'customer': customer,
-        'door_open_exists': bool(door_open_instance)
-    }
-
-    return render(request, 'door_open_selection.html', context)
-
-
-from .models import Frame, Customer, Measurement
-from .forms import FrameForm
-from django.shortcuts import render, get_object_or_404, redirect
-
-FRAME_ADJUSTMENTS = {
-    'Small': (-7.3, -7.3, -4.3),
-    'Normal': (-7.3, -7.3, -4.8),
-    'Medium': (-7.3, -7.3, -4.3),
-    'Heavy': (-11, -11, -6.3),
-    'DoorWithoutClearence': (0, 0, 0),
-    'DoorWithClearence': (-0.7, -0.7, -0.8)
-}
-
-def frame_selection(request, customer_id):
-    customer = get_object_or_404(Customer, pk=customer_id)
-    
-    # Check if Measurement exists for the customer
-    try:
-        initial_measurements = Measurement.objects.get(customer=customer)
-    except Measurement.DoesNotExist:
-        messages.error(request, "Measurement data is missing for the customer.")
-        return redirect('process_selection', customer_id=customer.id)  # Assuming you have a URL pattern named 'process_selection'
-
-    frame_exists = Frame.objects.filter(customer=customer).exists()
-    if frame_exists:
-        instance = Frame.objects.get(customer=customer)
-    else:
-        instance = None
-
-    if request.method == 'POST':
-        form = FrameForm(request.POST, instance=instance)
-        if form.is_valid():
-            frame = form.save(commit=False)
-            adjustment = FRAME_ADJUSTMENTS.get(frame.type)
-            if adjustment:
-                frame.top_measurement = initial_measurements.top + adjustment[0]
-                frame.breadth_measurement = initial_measurements.bottom + adjustment[1]
-                frame.height_measurement = initial_measurements.height + adjustment[2]
-            frame.customer = customer
-            frame.save()
-            return redirect('process_selection', customer_id=customer.id)  # Redirect back to the process selection
-
-    else:
-        form = FrameForm(instance=instance)
-
-    context = {
-        'form': form,
-        'customer': customer,
-        'frame_exists': frame_exists
-    }
-    return render(request, 'frame_selection.html', context)
+    return render(request, 'finish_selection.html', {'customer': customer, 'door': door, 'form': form})
 
 
 
+@login_required
 def update_advance_payment(request, customer_id):
     customer = get_object_or_404(Customer, pk=customer_id)
     if request.method == 'POST':
@@ -244,4 +156,42 @@ def update_advance_payment(request, customer_id):
             return redirect('process_selection', customer_id=customer.id)
     else:
         form = AdvancePaymentForm(instance=customer)
+
     return render(request, 'update_advance_payment.html', {'form': form, 'customer': customer})
+
+@login_required
+def door_open_selection(request, customer_id, door_id):
+    customer = get_object_or_404(Customer, id=customer_id)
+    door = get_object_or_404(Door, id=door_id)
+    existing_door_open = DoorOpen.objects.filter(door=door).first()  # Assuming DoorOpen model exists
+
+    if request.method == "POST":
+        form = DoorOpenForm(request.POST, instance=existing_door_open)
+        if form.is_valid():
+            door_open_instance = form.save(commit=False)
+            door_open_instance.door = door
+            door_open_instance.save()
+            return redirect('process_selection', customer_id=customer.id)
+    else:
+        form = DoorOpenForm(instance=existing_door_open)
+
+    return render(request, 'door_open_selection.html', {'customer': customer, 'door': door, 'form': form})
+
+
+@login_required
+def frame_selection(request, customer_id, door_id):
+    customer = get_object_or_404(Customer, id=customer_id)
+    door = get_object_or_404(Door, id=door_id)
+    existing_frame = Frame.objects.filter(door=door).first()  # Assuming Frame model exists
+
+    if request.method == "POST":
+        form = FrameForm(request.POST, instance=existing_frame)
+        if form.is_valid():
+            frame_instance = form.save(commit=False)
+            frame_instance.door = door
+            frame_instance.save()
+            return redirect('process_selection', customer_id=customer.id)
+    else:
+        form = FrameForm(instance=existing_frame)
+
+    return render(request, 'frame_selection.html', {'customer': customer, 'door': door, 'form': form})

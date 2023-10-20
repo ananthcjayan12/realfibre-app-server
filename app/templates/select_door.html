@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Doors for {{ customer.name }}</h2>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Existing Doors
+        </div>
+        <ul class="list-group list-group-flush">
+            {% for door in doors %}
+            <li class="list-group-item">
+                Door #{{ forloop.counter }}
+                <div class="float-right">
+                    <a href="{% url 'process_selection' door.id %}" class="btn btn-primary btn-sm">View Processes</a>
+                    <a href="{% url 'delete_door' door.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this door?')">Remove</a>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <form method="post" class="text-center">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Add New Door</button>
+    </form>
+
+</div>
+{% endblock %}

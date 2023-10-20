@@ -1,5 +1,5 @@
 from django import forms
-from .models import Customer,Measurement,Hinge,Lock,Finish,DoorOpen,Frame
+from .models import Customer, Door, Measurement, Hinge, Lock, Finish, DoorOpen, Frame
 
 class CustomerForm(forms.ModelForm):
     class Meta:
@@ -11,13 +11,10 @@ class MeasurementForm(forms.ModelForm):
         model = Measurement
         fields = ['top', 'bottom', 'height']
 
-
 class HingeForm(forms.ModelForm):
     class Meta:
         model = Hinge
         fields = ['type']
-from django import forms
-from .models import Lock
 
 class LockForm(forms.ModelForm):
     
@@ -33,8 +30,6 @@ class LockForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        # Set the sub_type choices based on the POSTed type value or the initial value
         lock_type = self.data.get('type') if 'type' in self.data else self.initial.get('type')
         if lock_type == 'Round':
             self.fields['sub_type'].choices = self.ROUND_SUBTYPES
@@ -59,13 +54,8 @@ class LockForm(forms.ModelForm):
 
         return cleaned_data
 
-
-
-
 class FinishForm(forms.ModelForm):
-
     FINISH_CHOICES = [('std', 'Std'), ('natural_wood', 'Natural Wood'), ('glossy', 'Glossy')]
-
     front = forms.ChoiceField(choices=FINISH_CHOICES)
     back = forms.ChoiceField(choices=FINISH_CHOICES)
 
@@ -73,19 +63,15 @@ class FinishForm(forms.ModelForm):
         model = Finish
         fields = ['front', 'back']
 
-
-
 class DoorOpenForm(forms.ModelForm):
     class Meta:
         model = DoorOpen
         fields = ['direction']
 
-
-
 class FrameForm(forms.ModelForm):
     class Meta:
         model = Frame
-        fields = ['type']
+        fields = ['type', 'top_measurement', 'breadth_measurement', 'height_measurement']
 
 class AdvancePaymentForm(forms.ModelForm):
     class Meta:
@@ -94,3 +80,10 @@ class AdvancePaymentForm(forms.ModelForm):
         labels = {
             'advance_paid': 'Advance Paid'
         }
+
+# New form to create a Door instance for a customer
+class DoorForm(forms.ModelForm):
+    class Meta:
+        model = Door
+        fields = []
+
