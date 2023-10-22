@@ -18,6 +18,20 @@
         </div>
     </div>
 </div>
+
+<div class="col-md-4 mb-4">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">
+                <span class="{{ doors.measurement|yesno:'text-success,text-danger' }}">&#9679;</span>
+                Door Selection
+            </h5>
+            <p class="card-text">Door , colour and Glass</p>
+            <a href="{% url 'door_and_glass_selector_view' doors.id %}" class="btn btn-primary">Go</a>
+        </div>
+    </div>
+</div>
+
 <!-- Hinges Card -->
 <div class="col-md-4 mb-4">
     <div class="card">

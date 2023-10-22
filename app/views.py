@@ -548,6 +548,7 @@ def door_and_glass_selector_view(request,door_id):
     current_glass_type = door_instance.glass_type_selection.glass_name if door_instance.glass_type_selection else None
 
 
+
     context = {
         'doors': doors,
         'door_glass_mapping': door_glass_mapping,
