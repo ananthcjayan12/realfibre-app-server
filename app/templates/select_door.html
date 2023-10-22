@@ -27,9 +27,7 @@
             </button>
             
 
-        {% if show_submit_order_button %}
-        <button type="submit" name="submit_order" class="btn btn-success btn-block">Submit Order <i class="fa fa-check"></i></button>
-        {% endif %}
+       
         </div>
         
         
@@ -69,6 +67,13 @@
     </div>
 
 
+    <form method="post" class="text-center mb-3">
+        {% if show_submit_order_button %}
+        {% csrf_token %}
+        <button type="submit" name="submit_order" class="btn btn-success btn-block">Submit Order <i class="fa fa-check"></i></button>
+        {% endif %}
+
+    </form>
 
 </div>
 {% endblock %}

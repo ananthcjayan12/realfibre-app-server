@@ -50,7 +50,24 @@ class Door(models.Model):
         return sum(1 for field in cls._meta.get_fields() if isinstance(field, models.OneToOneField))
     
     def is_all_processes_completed(self):
-        return self.completed_processes_count() == Door.total_processes_count()
+    # First, we check if all the required processes are completed
+        required_processes = [
+            self.measurement,
+            self.hinge_selection,
+            self.lock_selection,
+            self.finish_selection,
+            self.door_open_selection,
+            self.frame_selection,
+            self.model_selection,
+            self.primary_colour_selection
+        ]
+        
+        if not all(required_processes):
+            return False
+
+        # Since secondary_colour_selection and glass_type_selection are optional,
+        # their presence or absence doesn't affect the completion status
+        return True
 
 
 

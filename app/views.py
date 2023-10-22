@@ -39,6 +39,7 @@ def home(request):
     else:
         form = CustomerForm()
         query = request.GET.get('search', '')
+        print(request.user)
         customers = Customer.objects.filter(agent=request.user, name__icontains=query)[:5]  # Added search functionality and limited to first 5
 
     return render(request, 'home.html', {'customers': customers, 'form': form})
@@ -48,6 +49,7 @@ def home(request):
 def door_selection(request, customer_id):
     customer = get_object_or_404(Customer, id=customer_id)
     doors = Door.objects.filter(customer=customer).order_by('id')
+    no_of_doors=len(doors)
     all_doors_completed = all(door.is_all_processes_completed() for door in doors)
     if customer.delivery_date:
         formatted_date = customer.delivery_date.strftime('%Y-%m-%d')
@@ -71,7 +73,7 @@ def door_selection(request, customer_id):
     context = {
         'customer': customer,
         'doors': doors,
-        'show_submit_order_button': all_doors_completed and not customer.form_complete,
+        'show_submit_order_button': all_doors_completed and not customer.form_complete and no_of_doors != 0  and customer.delivery_date,
         'formatted_date':formatted_date
     }
     
