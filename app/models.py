@@ -77,7 +77,7 @@ class Measurement(models.Model):
     bottom = models.FloatField()
     height = models.FloatField()
     def __str__(self):
-        return f"Top:{self.top}, Bottom:{self.bottom}, Height:{self.height}"
+        return f"T:{self.top}, B:{self.bottom}, H:{self.height}"
     
 
 class Hinge(models.Model):

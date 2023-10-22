@@ -283,7 +283,7 @@ def show_pdf(request, customer_id):
     print(customer_id)
     customer = Customer.objects.get(pk=customer_id)
     doors = Door.objects.filter(customer=customer)
-    return render_pdf('door_pdf_template.html', {'doors': doors, 'customer': customer})
+    return render_pdf('admin_pdf_template.html', {'doors': doors, 'customer': customer})
 
 
 def door_pdf_view(request, customer_id):
