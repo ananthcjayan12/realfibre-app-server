@@ -7,6 +7,8 @@ from django.contrib import messages
 import json
 from django.urls import reverse_lazy
 from django.contrib.auth.views import LoginView
+from django.templatetags.static import static
+
 FRAME_ADJUSTMENTS = {
     'Small': (-7.3, -7.3, -4.3),
     'Normal': (-7.3, -7.3, -4.8),
@@ -414,3 +416,150 @@ def create_agent(request):
     else:
         form = AgentCreationForm()
     return render(request, 'create_agent.html', {'form': form})
+
+
+from django.templatetags.static import static
+
+def door_and_glass_selector(request):
+    # List of door names (extracted from your image filenames)
+    doors = [
+        "petra", "triangle", "astonia", "cloud", "delta", "flora", "hexa", "horizon", "liva", "mars", "milton",
+        "narrow", "periyar", "rectaglass", "regal", "regency", "richmond", "rivera", "simplon", "skill",
+        "spasio", "vector", "venues", "vetrix", "wayanad", "wexco", "wexcoglass","venuesglass"
+    ]
+
+    # Dictionary mapping doors to their associated glasses
+    door_glass_mapping = {
+    "delta": ["EL01", "EL02", "EL03", "EL04", "EL05", "EL06", "EL07", "EL08", "EL09", "EL10"],
+    "cloud": [f"PY{i:02}" for i in range(1, 13)],  # PY01 to PY12
+    "simplon": [f"PK{i:02}" for i in range(1, 11)],  # PK01 to PK10
+    "hexa": [f"XA{i:02}" for i in range(1, 10)],  # XA01 to XA09
+    "wexcoglass": [f"GL{i:02}" for i in range(1, 11)],  # GL01 to GL10
+    "rectaglass": [f"GL{i:02}" for i in range(11, 21)],  # GL11 to GL20
+    "vector": [f"TR{i:02}" for i in range(1, 11)],  # TR01 to TR10
+    "horizon": [f"RZ{i:02}" for i in range(1, 13)],  # RZ01 to RZ12
+    "astonia": [f"TB{i:02}" for i in range(1, 11)],  # TB01 to TB10
+    "liva": [f"AV{i:02}" for i in range(1, 12)],  # AV01 to AV11
+    "venuesglass": [f"V{i:02}" for i in range(1, 10)]  # V01 to V09
+}
+
+
+    # Create the static paths for door images and their respective glasses
+    door_images_js = {door: static(f'doors/{door}.png') for door in doors}
+    door_glass_mapping_js = {door: [static(f'glass/{glass}.png') for glass in glasses] for door, glasses in door_glass_mapping.items()}
+    door_images_json = json.dumps(door_images_js)
+    door_glass_mapping_json = json.dumps(door_glass_mapping_js) 
+    colors = [
+    "coffee", "darkgrey", "eeti", "leatherfinish", "lightgrey", "mahagani",
+    "teakwooddark", "teakwoodlight", "white"
+]
+    color_images_js = {color: static(f'colours/{color}.png') for color in colors}
+    colors_mapping_json = json.dumps(color_images_js)
+    
+
+
+    context = {
+        'doors': doors,
+        'door_glass_mapping': door_glass_mapping,
+        'door_images_json': door_images_json,
+        'door_glass_mapping_json': door_glass_mapping_json,
+        'colors_mapping_json': colors_mapping_json,
+       'colors' :colors
+    } 
+
+    return render(request, 'door_and_glass_selector.html', context)
+
+
+def door_and_glass_selector_view(request,door_id):
+    door_instance = get_object_or_404(Door, id=door_id)
+
+    if request.method == 'POST':
+        print(request.POST)
+        door_model_name = request.POST.get('doormodel')
+        primary_color_name = request.POST.get('primarycolour')
+        secondary_color_name = request.POST.get('secondarycolour')
+        glass_type_name = request.POST.get('glasstype')
+
+        if door_model_name:
+            door_model_instance, created = DoorModel.objects.get_or_create(model_name=door_model_name, door=door_instance)
+            door_instance.model_selection = door_model_instance
+        else :
+            door_instance.model_selection = None
+
+        if primary_color_name:
+            primary_color_instance, created = PrimaryColour.objects.get_or_create(color_name=primary_color_name, door=door_instance)
+            door_instance.primary_colour_selection = primary_color_instance
+        else :
+            door_instance.primary_colour_selection = None
+
+
+        if secondary_color_name:
+            secondary_color_instance, created = SecondaryColour.objects.get_or_create(color_name=secondary_color_name, door=door_instance)
+            door_instance.secondary_colour_selection = secondary_color_instance
+        else :
+            door_instance.secondary_colour_selection = None
+
+        if glass_type_name:
+            glass_type_instance, created = GlassType.objects.get_or_create(glass_name=glass_type_name, door=door_instance)
+            door_instance.glass_type_selection = glass_type_instance
+        else :
+            door_instance.glass_type_selection = None
+
+        door_instance.save()
+
+
+    # List of door names (extracted from your image filenames)
+    doors = [
+        "petra", "triangle", "astonia", "cloud", "delta", "flora", "hexa", "horizon", "liva", "mars", "milton",
+        "narrow", "periyar", "rectaglass", "regal", "regency", "richmond", "rivera", "simplon", "skill",
+        "spasio", "vector", "venues", "vetrix", "wayanad", "wexco", "wexcoglass","venuesglass"
+    ]
+
+    # Dictionary mapping doors to their associated glasses
+    door_glass_mapping = {
+    "delta": ["EL01", "EL02", "EL03", "EL04", "EL05", "EL06", "EL07", "EL08", "EL09", "EL10"],
+    "cloud": [f"PY{i:02}" for i in range(1, 13)],  # PY01 to PY12
+    "simplon": [f"PK{i:02}" for i in range(1, 11)],  # PK01 to PK10
+    "hexa": [f"XA{i:02}" for i in range(1, 10)],  # XA01 to XA09
+    "wexcoglass": [f"GL{i:02}" for i in range(1, 11)],  # GL01 to GL10
+    "rectaglass": [f"GL{i:02}" for i in range(11, 21)],  # GL11 to GL20
+    "vector": [f"TR{i:02}" for i in range(1, 11)],  # TR01 to TR10
+    "horizon": [f"RZ{i:02}" for i in range(1, 13)],  # RZ01 to RZ12
+    "astonia": [f"TB{i:02}" for i in range(1, 11)],  # TB01 to TB10
+    "liva": [f"AV{i:02}" for i in range(1, 12)],  # AV01 to AV11
+    "venuesglass": [f"V{i:02}" for i in range(1, 10)]  # V01 to V09
+}
+
+
+    # Create the static paths for door images and their respective glasses
+    door_images_js = {door: static(f'doors/{door}.png') for door in doors}
+    door_glass_mapping_js = {door: [static(f'glass/{glass}.png') for glass in glasses] for door, glasses in door_glass_mapping.items()}
+    door_images_json = json.dumps(door_images_js)
+    door_glass_mapping_json = json.dumps(door_glass_mapping_js) 
+    colors = [
+    "coffee", "darkgrey", "eeti", "leatherfinish", "lightgrey", "mahagani",
+    "teakwooddark", "teakwoodlight", "white"
+]
+    color_images_js = {color: static(f'colours/{color}.png') for color in colors}
+    colors_mapping_json = json.dumps(color_images_js)
+    current_door_model = door_instance.model_selection.model_name if door_instance.model_selection else None
+    current_primary_color = door_instance.primary_colour_selection.color_name if door_instance.primary_colour_selection else None
+    current_secondary_color = door_instance.secondary_colour_selection.color_name if door_instance.secondary_colour_selection else None
+    current_glass_type = door_instance.glass_type_selection.glass_name if door_instance.glass_type_selection else None
+
+
+    context = {
+        'doors': doors,
+        'door_glass_mapping': door_glass_mapping,
+        'door_images_json': door_images_json,
+        'door_glass_mapping_json': door_glass_mapping_json,
+        'colors_mapping_json': colors_mapping_json,
+       'colors' :colors,
+       'door_instance':door_instance,
+       'current_door_model': current_door_model,
+        'current_primary_color': current_primary_color,
+        'current_secondary_color': current_secondary_color,
+        'current_glass_type': current_glass_type,
+               } 
+
+    return render(request, 'doorglass.html', context)

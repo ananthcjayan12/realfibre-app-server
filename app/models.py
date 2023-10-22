@@ -28,6 +28,10 @@ class Door(models.Model):
     finish_selection = models.OneToOneField('Finish', on_delete=models.SET_NULL, blank=True, null=True)
     door_open_selection = models.OneToOneField('DoorOpen', on_delete=models.SET_NULL, blank=True, null=True)
     frame_selection = models.OneToOneField('Frame', on_delete=models.SET_NULL, blank=True, null=True)
+    model_selection = models.OneToOneField('DoorModel', on_delete=models.SET_NULL, blank=True, null=True, related_name='model_selection')
+    glass_type_selection = models.OneToOneField('GlassType', on_delete=models.SET_NULL, blank=True, null=True, related_name='glass_type_selection')
+    primary_colour_selection = models.OneToOneField('PrimaryColour', on_delete=models.SET_NULL, blank=True, null=True, related_name='primary_colour_selection')
+    secondary_colour_selection = models.OneToOneField('SecondaryColour', on_delete=models.SET_NULL, blank=True, null=True, related_name='secondary_colour_selection')
     def __str__(self):
         return f"Door {self.id} for {self.customer.name}"
     def completed_processes_count(self):
@@ -108,6 +112,19 @@ class ColorCombination(models.Model):
     color_name = models.CharField(max_length=100)
     def __str__(self):
         return self.color_name
+
+class PrimaryColour(models.Model):
+    door = models.ForeignKey(Door, on_delete=models.CASCADE)
+    color_name = models.CharField(max_length=100)
+    def __str__(self):
+        return self.color_name
+    
+class SecondaryColour(models.Model):
+    door = models.ForeignKey(Door, on_delete=models.CASCADE)
+    color_name = models.CharField(max_length=100)
+    def __str__(self):
+        return self.color_name
+
 
 class GlassType(models.Model):
     door = models.ForeignKey(Door, on_delete=models.CASCADE)

@@ -22,6 +22,9 @@ urlpatterns = [
      path('login/', views.CustomLoginView.as_view(), name='agent_login'),
     path('logout/', views.agent_logout, name='agent_logout'),
     path('create_agent/', views.create_agent, name='create_agent'),
+    path('door_and_glass_selector/', views.door_and_glass_selector, name='door_and_glass_selector'),
+    path('door_and_glass_selector/<int:door_id>/', views.door_and_glass_selector_view, name='door_and_glass_selector_view'),
+
 
     # ... other URL patterns ...
 
