@@ -38,7 +38,6 @@
                 <div class="card-body">
                     <label for="glassSelect">Select Glass:</label>
                     <select name="glasstype" id="glassSelect" class="form-control mb-3" onchange="updateGlassImage()" disabled>
-                        <option value="{{ current_glass_type }}" {% if door == current_door_model %}selected{% endif %}>{{ door }}>--Select a Glass--</option>
                     </select>
                     <div class="text-center">
                         <img id="glassImage" class="img-fluid" src="" alt="Selected Glass Image">
@@ -137,11 +136,19 @@ function updateDoorImage() {
         glassSelectElement.disabled = true;
     }
 
-    // Check for currentGlassType and ensure it's not "none"
-    if (currentGlassType && currentGlassType !== "none" && doorGlassMapping[selectedDoor].includes("/static/glass/" + currentGlassType + ".png")) {
-        glassSelectElement.value = currentGlassType; // This will automatically select the option with the value of currentGlassType
-        document.getElementById("glassImage").src = "/static/glass/" + currentGlassType + ".png";
-    }
+// Check for currentGlassType, ensure it's not "none", and ensure the image exists
+if (currentGlassType && 
+    currentGlassType !== "none" && 
+    doorGlassMapping.hasOwnProperty(selectedDoor) && // Check if the key for the selected door exists
+    doorGlassMapping[selectedDoor].includes("/static/glass/" + currentGlassType + ".png")) {
+
+    glassSelectElement.value = currentGlassType; 
+    document.getElementById("glassImage").src = "/static/glass/" + currentGlassType + ".png";
+} else {
+    // Reset the image source if the conditions are not met
+    document.getElementById("glassImage").src = "";
+}
+
 }
 
 

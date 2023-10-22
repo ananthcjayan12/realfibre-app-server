@@ -37,8 +37,13 @@
             <div class="card">
                 <div class="card-body">
                     <label for="glassSelect">Select Glass:</label>
+                    
                     <select name="glasstype" id="glassSelect" class="form-control mb-3" onchange="updateGlassImage()" disabled>
-                        <option value="{{ current_glass_type }}" {% if door == current_door_model %}selected{% endif %}>{{ door }}>--Select a Glass--</option>
+                        
+                        {% if current_glass_type %}
+                        
+                        <option value="{{ current_glass_type }}" selected>{{ current_glass_type }}</option>
+                    {% endif %}
                     </select>
                     <div class="text-center">
                         <img id="glassImage" class="img-fluid" src="" alt="Selected Glass Image">

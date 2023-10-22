@@ -23,7 +23,7 @@
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">
-                <span class="{{ doors.measurement|yesno:'text-success,text-danger' }}">&#9679;</span>
+                <span class="{{ doors.model_selection|yesno:'text-success,text-danger' }}">&#9679;</span>
                 Door Selection
             </h5>
             <p class="card-text">Door , colour and Glass</p>
@@ -96,6 +96,9 @@
             <a href="{% url 'frame_selection' doors.id %}" class="btn btn-primary">Go</a>
         </div>
     </div>
+</div>
+<div class="mt-4 text-center">
+    <a href="{% url 'door_and_glass_selector_view' doors.id %}" class="btn btn-secondary">Back to Door Selection</a>
 </div>
 
     <!-- Other cards can follow in a similar fashion -->

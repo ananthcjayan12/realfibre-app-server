@@ -4,10 +4,8 @@
 <div class="container-fluid p-3">
 
     <h3 class="text-center mb-4">Doors for {{ customer.name }}</h3>
-
-    <form method="post" action="{% url 'update_customer_details' customer.id %}">
+    <form method="post" class="text-center mb-3">
         {% csrf_token %}
-
         <div class="card mb-3">
             <div class="card-header">
                 <i class="fa fa-door-open"></i> Existing Doors
@@ -24,8 +22,24 @@
                 </li>
                 {% endfor %}
             </ul>
+            <button type="submit" class="btn btn-primary plus-button">
+                <i class="fas fa-plus"></i>
+            </button>
+            
+
+        {% if show_submit_order_button %}
+        <button type="submit" name="submit_order" class="btn btn-success btn-block">Submit Order <i class="fa fa-check"></i></button>
+        {% endif %}
         </div>
         
+        
+        
+    </form>
+
+    <form method="post" action="{% url 'update_customer_details' customer.id %}">
+        {% csrf_token %}
+
+
         <!-- Delivery Date Card -->
         <div class="card mb-3">
             <div class="card-header">
@@ -35,23 +49,16 @@
                 <label for="delivery_date">Set Delivery Date:</label>
                 {{customer.delivery_date}}
                 <input type="date" name="delivery_date" id="delivery_date" value="{{ formatted_date }}" class="form-control mb-2">
-            </div>
-        </div>
-
-        <!-- Advance Paid Card -->
-        <div class="card mb-3">
-            <div class="card-header">
-                <i class="fa fa-dollar-sign"></i> Advance Paid
-            </div>
-            <div class="card-body">
                 <label for="advance_paid">Update Advance Paid ($):</label>
                 <input type="number" name="advance_paid" id="advance_paid" step="0.01" value="{{ customer.advance_paid|default:'0.00' }}" class="form-control">
             </div>
+            <div class="text-center mb-3">
+                <button type="submit" class="btn btn-primary btn-block">Update Details</button>
+            </div>
+            
         </div>
 
-        <div class="text-center mb-3">
-            <button type="submit" class="btn btn-primary btn-block">Update Details</button>
-        </div>
+        <!-- Advance Paid Card -->
     </form>
 
     <!-- Existing Doors Card -->
@@ -61,13 +68,7 @@
         <a href="{% url 'door_pdf' customer.id %}" class="btn btn-secondary btn-block">Show PDF <i class="fa fa-file-pdf"></i></a>
     </div>
 
-    <form method="post" class="text-center mb-3">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-primary btn-block">Add New Door <i class="fa fa-plus"></i></button>
-        {% if show_submit_order_button %}
-        <button type="submit" name="submit_order" class="btn btn-success btn-block">Submit Order <i class="fa fa-check"></i></button>
-        {% endif %}
-    </form>
+
 
 </div>
 {% endblock %}
