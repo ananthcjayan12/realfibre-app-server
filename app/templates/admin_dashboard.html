@@ -84,13 +84,12 @@
 <script>
     function updateBalance(customerId) {
         var newBalance = document.getElementById('balance_' + customerId).value;
-        var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        
+
         fetch('{% url "update_balance" %}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken,
+
             },
             body: JSON.stringify({
                 customer_id: customerId,
@@ -114,13 +113,13 @@
     }
 
     function updatePriority(customerId, newPriority) {
-        var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
         
         fetch('{% url "update_priority" %}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken,
+   
             },
             body: JSON.stringify({
                 customer_id: customerId,

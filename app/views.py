@@ -539,7 +539,7 @@ def update_balance(request):
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
 
-
+@csrf_exempt
 @require_POST
 def update_priority(request):
     try:
