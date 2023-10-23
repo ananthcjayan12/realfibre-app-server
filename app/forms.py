@@ -110,3 +110,16 @@ class AgentCreationForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+
+
+class CustomerFilterForm(forms.Form):
+    delivery_date_from = forms.DateField(required=False)
+    delivery_date_to = forms.DateField(required=False)
+    customer_search = forms.CharField(max_length=100, required=False)
+    status = forms.ChoiceField(choices=[('', 'All'), ('due', 'Due'), ('upcoming', 'Upcoming'), ('pending', 'Pending'), ('completed', 'Completed')], required=False)
+    priority = forms.ChoiceField(choices=[('', 'All')] + Customer.PRIORITY_CHOICES, required=False)
+
+class UpdatePriorityForm(forms.ModelForm):
+    class Meta:
+        model = Customer
+        fields = ['priority']

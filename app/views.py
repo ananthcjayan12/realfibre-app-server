@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import *
-from .forms import CustomerForm, MeasurementForm, HingeForm, LockForm, FinishForm, DoorOpenForm, FrameForm, AdvancePaymentForm,DoorForm ,AgentCreationForm
+from .forms import CustomerForm, MeasurementForm, HingeForm, LockForm, FinishForm, DoorOpenForm, FrameForm, AdvancePaymentForm,DoorForm ,AgentCreationForm,CustomerFilterForm,UpdatePriorityForm
 from django.http import HttpResponseForbidden
 from django.contrib import messages
 import json
@@ -334,41 +334,46 @@ from django.shortcuts import render
 from .models import Customer
 
 def admin_dashboard(request):
-    # By default, show all customers
+    form = CustomerFilterForm(request.GET)
     customers = Customer.objects.filter(form_complete=True)
 
-    # Filter based on the delivery date range
-    delivery_date_from = request.GET.get('delivery_date_from')
-    delivery_date_to = request.GET.get('delivery_date_to')
-    
-    if delivery_date_from and delivery_date_to:
-        customers = customers.filter(delivery_date__range=[delivery_date_from, delivery_date_to])
-    
-    # Search box for customer name
-    customer_search = request.GET.get('customer_search')
-    if customer_search:
-        customers = customers.filter(name__icontains=customer_search)
+    if request.method == 'POST':
+        customer_id = request.POST.get('customer_id')
+        form = UpdatePriorityForm(request.POST, instance=Customer.objects.get(id=customer_id))
+        if form.is_valid():
+            form.save()
+            return redirect('admin_dashboard')
 
-    # Quick filter for Due Customers
-    status = request.GET.get('status')
-    if status == 'due':
-        customers = customers.filter(status="PENDING").filter(form_complete=True).filter(delivery_date__lte=datetime.now().date())
-    elif status == 'upcoming':
-        upcoming_date = datetime.now().date() + timedelta(days=7)
-        customers = customers.filter(status="PENDING").filter(form_complete=True).filter(delivery_date__range=[datetime.now().date(), upcoming_date])
-    elif status == 'pending':
-        upcoming_date = datetime.now().date() + timedelta(days=7)
-        customers = customers.filter(status="PENDING").filter(form_complete=True)
-    elif status == 'completed':
-        upcoming_date = datetime.now().date() + timedelta(days=7)
-        customers = customers.filter(status="COMPLETE").filter(form_complete=True)
+    if form.is_valid():
+        data = form.cleaned_data
+        delivery_date_from = data.get('delivery_date_from')
+        delivery_date_to = data.get('delivery_date_to')
+        customer_search = data.get('customer_search')
+        status = data.get('status')
+        priority = data.get('priority')
+
+        if delivery_date_from and delivery_date_to:
+            customers = customers.filter(delivery_date__range=[delivery_date_from, delivery_date_to])
+        if customer_search:
+            customers = customers.filter(name__icontains=customer_search)
+        if status:
+            if status == 'due':
+                customers = customers.filter(status="PENDING", delivery_date__lte=datetime.now().date())
+            elif status == 'upcoming':
+                upcoming_date = datetime.now().date() + timedelta(days=7)
+                customers = customers.filter(status="PENDING", delivery_date__range=[datetime.now().date(), upcoming_date])
+            elif status == 'pending':
+                customers = customers.filter(status="PENDING")
+            elif status == 'completed':
+                customers = customers.filter(status="COMPLETE")
+        if priority:
+            customers = customers.filter(priority=priority)
 
     context = {
         'customers': customers,
+        'form': form,
     }
-
     return render(request, 'admin_dashboard.html', context)
-
 
 
 def mark_as_complete(request, customer_id):
@@ -376,16 +381,6 @@ def mark_as_complete(request, customer_id):
     customer.status = 'COMPLETE'
     customer.save()
     return redirect('admin_dashboard')
-
-def update_balance(request, customer_id):
-    customer = get_object_or_404(Customer, id=customer_id)
-    if request.method == 'POST':
-        # Update the customer's balance amount
-        new_balance = request.POST.get('balance_amount')
-        # Logic to update balance amount goes here
-        return redirect('admin_dashboard')
-    return render(request, 'update_balance_template.html', {'customer': customer})
-
 from django.contrib.auth import authenticate, login,logout
 from django.shortcuts import render, redirect
 
@@ -518,3 +513,45 @@ def door_and_glass_selector_view(request,door_id):
     
 
     return render(request, 'doorglass1.html', context)
+
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+import json
+
+@csrf_exempt
+@require_POST
+def update_balance(request):
+    data = json.loads(request.body)
+    customer_id = data.get('customer_id')
+    new_balance = data.get('new_balance')
+    
+    # Update the customer's balance amount in the database
+    # Make sure to handle any potential errors and respond accordingly
+    try:
+        customer = Customer.objects.get(id=customer_id)
+        customer.balance_amount = new_balance
+        customer.save()
+        return JsonResponse({'success': True})
+    except Customer.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Customer not found'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+@require_POST
+def update_priority(request):
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+        customer_id = data.get('customer_id')
+        new_priority = data.get('new_priority')
+        
+        customer = Customer.objects.get(id=customer_id)
+        customer.priority = new_priority
+        customer.save()
+        return JsonResponse({'success': True})
+    except Customer.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Customer not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)

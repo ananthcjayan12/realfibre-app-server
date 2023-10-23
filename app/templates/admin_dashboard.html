@@ -1,52 +1,29 @@
-{% extends 'base.html' %}
+{% extends 'base_admin.html' %}
 
 {% block content %}
 
 <div class="container-fluid">
-    <!-- Main Header with a subtle background -->
-    <div class="row py-4 bg-light align-items-center"> <!-- Added align-items-center for vertical centering -->
+    <!-- Main Header -->
+    <div class="row py-4" style="background-color: #004165; color: #ffffff;">
         <div class="col-md-9">
             <h2 class="mb-0">Admin Dashboard</h2>
             <small>Manage customer orders and balances</small>
         </div>
-        <div class="col-md-3 text-right">
-            <a href="{% url 'create_agent' %}" class="btn btn-outline-dark">Add Agent</a>
+        <div class="col-md-3 text-md-right mt-2 mt-md-0">
+            <a href="{% url 'create_agent' %}" class="btn btn-outline-light">Add Agent</a>
         </div>
     </div>
 
-    <div class="row mt-5">
-        <!-- Sidebar for Filters with Card styling and shadows -->
+    <div class="row mt-4">
+        <!-- Sidebar for Filters -->
         <div class="col-md-3">
-            <div class="card">
+            <div class="card border-left-info shadow">
                 <div class="card-body">
-                    <h4 class="card-title">Filter Options</h4>
+                    <h4 class="card-title mb-4" style="color: #0056b3;">Filter Options</h4>
                     <form method="get">
-                        <div class="mb-3">
-                            <label for="customer_search">Search Customer:</label>
-                            <input type="text" id="customer_search" name="customer_search" class="form-control" placeholder="Search by name...">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="delivery_date_from">Delivery Date From:</label>
-                            <input type="date" id="delivery_date_from" name="delivery_date_from" class="form-control">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="delivery_date_to">Delivery Date To:</label>
-                            <input type="date" id="delivery_date_to" name="delivery_date_to" class="form-control">
-                        </div>
-
-                        <button type="submit" class="btn btn-primary mb-2 w-100">Apply Filters</button>
-                        <a href="{% url 'admin_dashboard' %}" class="btn btn-light w-100">Clear Filters</a>
-
-                        <!-- Additional Filtering Options with a differentiating background -->
-                        <div class="mt-4 p-3 bg-secondary text-white rounded">
-                            <h5 class="mb-3">Quick Filters:</h5>
-                            <a href="?status=due" class="btn btn-warning btn-sm mb-2 w-100">Due Customers</a>
-                            <a href="?status=upcoming" class="btn btn-info btn-sm mb-2 w-100">Upcoming Dues</a>
-                            <a href="?status=pending" class="btn btn-warning btn-sm mb-2 w-100">Pending Orders</a>
-                            <a href="?status=completed" class="btn btn-info btn-sm mb-2 w-100">Completed Orders</a>
-                        </div>
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-info mb-2 w-100">Apply Filters</button>
+                        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary w-100">Clear Filters</a>
                     </form>
                 </div>
             </div>
@@ -54,41 +31,124 @@
 
         <!-- Main content for Customers List -->
         <div class="col-md-9">
-            <div class="card">
+            <div class="card border-left-info shadow">
                 <div class="card-body">
-                    <h3 class="card-title">Customers</h3>
-                    <table class="table table-hover"> <!-- Removed borders and stripes for cleaner look -->
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Due Date</th>
-                                <th>Status</th>
-                                <th>Advance Paid</th>
-                                <th>Balance Amount</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for customer in customers %}
-                            <tr>
-                                <td>{{ customer.name }}</td>
-                                <td>{{ customer.delivery_date }}</td>
-                                <td>{{ customer.status }}</td>
-                                <td>₹{{ customer.advance_paid }}</td>
-                                <td>₹{{ customer.advance_paid }}</td>
-                                <td>
-                                    <a href="{% url 'mark_as_complete' customer.id %}" class="btn btn-outline-success btn-sm">Complete</a>
-                                    <a href="{% url 'show_pdf' customer.id %}" class="btn btn-outline-secondary btn-sm">PDF</a>
-                                    <a href="{% url 'update_balance' customer.id %}" class="btn btn-outline-primary btn-sm">Update</a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                    <h3 class="card-title mb-4" style="color: #0056b3;">Customers</h3>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Due Date</th>
+                                    <th>Status</th>
+                                    <th>Advance Paid</th>
+                                    <th>Balance Amount</th>
+                                    <th>Priority</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for customer in customers %}
+                                <tr>
+                                    <td>{{ customer.name }}</td>
+                                    <td>{{ customer.delivery_date }}</td>
+                                    <td>{{ customer.status }}</td>
+                                    <td>₹{{ customer.advance_paid }}</td>
+                                    <td>
+                                        <input type="number" id="balance_{{ customer.id }}" value="{{ customer.balance_amount }}" class="form-control form-control-sm" style="max-width: 100px; display: inline-block;">
+                                        ₹<span id="balance_text_{{ customer.id }}" style="display: none;">{{ customer.balance_amount }}</span>
+                                    </td>
+                                    <td>
+                                        <select onchange="updatePriority('{{ customer.id }}', this.value)" class="form-control form-control-sm">
+                                            {% for choice in customer.PRIORITY_CHOICES %}
+                                                <option value="{{ choice.0 }}" {% if customer.priority == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <button onclick="updateBalance('{{ customer.id }}')" class="btn btn-outline-info btn-sm">Save</button>
+                                        <a href="{% url 'mark_as_complete' customer.id %}" class="btn btn-outline-success btn-sm">Complete</a>
+                                        <a href="{% url 'show_pdf' customer.id %}" class="btn btn-outline-secondary btn-sm">PDF</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<script>
+    function updateBalance(customerId) {
+        var newBalance = document.getElementById('balance_' + customerId).value;
+        var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        fetch('{% url "update_balance" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify({
+                customer_id: customerId,
+                new_balance: newBalance,
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('balance_text_' + customerId).innerText = newBalance;
+                document.getElementById('balance_' + customerId).style.display = 'none';
+                document.getElementById('balance_text_' + customerId).style.display = 'inline';
+            } else {
+                alert('Failed to update balance');
+            }
+        })
+        .catch(error => {
+            console.error('Error updating balance:', error);
+            alert('Failed to update balance');
+        });
+    }
+
+    function updatePriority(customerId, newPriority) {
+        var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        fetch('{% url "update_priority" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify({
+                customer_id: customerId,
+                new_priority: newPriority,
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Priority updated successfully');
+            } else {
+                alert('Failed to update priority');
+            }
+        })
+        .catch(error => {
+            console.error('Error updating priority:', error);
+            alert('Failed to update priority');
+        });
+    }
+
+</script>
+<script>
+    $(document).ready(function() {
+        $('#id_delivery_date_from, #id_delivery_date_to').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayHighlight: true
+        });
+    });
+    </script>
 {% endblock %}

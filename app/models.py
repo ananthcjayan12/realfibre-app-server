@@ -2,6 +2,7 @@ from django.db import models
 
 class Customer(models.Model):
     STATUS_CHOICES = [('COMPLETE', 'COMPLETE'), ('PENDING', 'PENDING')]
+    PRIORITY_CHOICES = [('HIGH', 'HIGH'), ('LESS', 'LESS')]
 
     agent = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
@@ -11,8 +12,10 @@ class Customer(models.Model):
     delivery_date = models.DateField(null=True, blank=True)
     order_date = models.DateField(null=True, blank=True)
     advance_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    balance_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
     form_complete = models.BooleanField(default=False)
     status = models.CharField(choices=STATUS_CHOICES, max_length=20, default="PENDING")
+    priority = models.CharField(choices=PRIORITY_CHOICES, max_length=20, default="high")
     
     def __str__(self):
         return self.name
