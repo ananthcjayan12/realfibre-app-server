@@ -74,8 +74,8 @@
                                 <td>{{ customer.name }}</td>
                                 <td>{{ customer.delivery_date }}</td>
                                 <td>{{ customer.status }}</td>
-                                <td>${{ customer.advance_paid }}</td>
-                                <td>${{ customer.advance_paid }}</td>
+                                <td>₹{{ customer.advance_paid }}</td>
+                                <td>₹{{ customer.advance_paid }}</td>
                                 <td>
                                     <a href="{% url 'mark_as_complete' customer.id %}" class="btn btn-outline-success btn-sm">Complete</a>
                                     <a href="{% url 'show_pdf' customer.id %}" class="btn btn-outline-secondary btn-sm">PDF</a>

@@ -47,7 +47,7 @@
                 <label for="delivery_date">Set Delivery Date:</label>
                 {{customer.delivery_date}}
                 <input type="date" name="delivery_date" id="delivery_date" value="{{ formatted_date }}" class="form-control mb-2">
-                <label for="advance_paid">Update Advance Paid ($):</label>
+                <label for="advance_paid">Update Advance Paid (₹):</label>
                 <input type="number" name="advance_paid" id="advance_paid" step="0.01" value="{{ customer.advance_paid|default:'0.00' }}" class="form-control">
             </div>
             <div class="text-center mb-3">
