@@ -555,3 +555,125 @@ def update_priority(request):
         return JsonResponse({'success': False, 'error': 'Customer not found'}, status=404)
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
+    
+
+from django.db.models import Q
+
+def show_pdf_for_day(request):
+    mold_data = {
+    'astoni': 1,
+    'cloud': 4,
+    'delta': 4,
+    'flora': 1,
+    'horizon': 2,
+    'hexa': 6,
+    'liva': 2,
+    'milton': 2,
+    'mars': 1,
+    'petra': 3,
+    'periyar': 2,
+    'regal': 1,
+    'rectaglass': 2,  # Assuming 'recta' corresponds to 'rectaglass' in the mold list
+    'regency': 4,
+    'rivera': 5,
+    'spasio': 5,
+    'skill': 3,
+    'simplon': 2,
+    'vector': 2,
+    'venues': 2,
+    'wexco': 2,
+    'richmond': 3,  # Assuming 'richmound' corresponds to 'richmond' in the mold list
+    'wayanad': 3,
+    'vetrix': 1,
+    'triangle': 0,
+    'narrow': 0,
+    'wexcoglass': 0
+}
+
+
+    today = date.today()
+    try:
+        existing_batch = DoorBatch.objects.get(date=today)
+    except DoorBatch.DoesNotExist:
+        existing_batch = None
+
+    # If a batch exists for today, fetch doors from it
+    if existing_batch:
+        fulfilled_doors = list(existing_batch.doors.all())
+    else:
+        # If no batch for today, prepare a new batch
+        all_doors = Door.objects.filter(finished=False).filter(customer__form_complete=True).order_by('customer__delivery_date')
+        fulfilled_doors = []
+
+        for door in all_doors:
+            try:
+                model_name = door.model_selection.model_name.lower()
+                if model_name in mold_data and mold_data[model_name] > 0:
+                    fulfilled_doors.append(door)
+                    mold_data[model_name] -= 1
+            except:
+                pass
+
+        # Create a new batch for today and add the prepared doors to it
+        new_batch = DoorBatch(date=today)
+        new_batch.save()
+        new_batch.doors.add(*fulfilled_doors)
+
+    customers = [door.customer for door in fulfilled_doors]
+    return render_pdf('customer_to_be_print.html', {'doors': fulfilled_doors, 'customers': customers})
+
+
+def door_batch_dashboard(request):
+    # Get today's batch or None
+    todays_batch = DoorBatch.objects.filter(date=date.today()).first()
+
+    # If batch is not available, create a new batch
+    if not todays_batch:
+        todays_batch = DoorBatch.create_batch_for_today()
+
+    if request.method == 'POST':
+        if 'complete_batch' in request.POST:
+            todays_batch.mark_as_complete()
+            return redirect('door_batch_dashboard')
+        elif 'remove_door' in request.POST:
+            door_id = request.POST.get('door_id')
+            door = Door.objects.get(pk=door_id)
+            todays_batch.remove_door(door)
+            return redirect('door_batch_dashboard')
+        elif 'reset_batch' in request.POST:
+            todays_batch.delete()
+            return redirect('door_batch_dashboard') 
+
+    return render(request, 'door_batch_dashboard.html', {'batch': todays_batch})
+
+
+
+def doorwise_dashboard(request):
+    context = {}
+    all_doors = Door.objects.filter(customer__form_complete=True)
+
+    # If no filters, show all doors
+    context['filter'] = "All Doors"
+    
+    # Check for 'finished' filter
+    if request.GET.get('finished') is not None:
+        status = request.GET.get('finished').lower() == 'true'
+        all_doors = all_doors.filter(finished=status)
+        context['filter'] += f", Finished: {status}"
+
+    # Check for 'glass_selected' filter
+    if request.GET.get('glass_selected'):
+        all_doors = all_doors.filter(glass_type_selection__isnull=False)
+        context['filter'] += ", Doors with Glass Selection"
+
+    # Check for 'delivery_date' filter
+    if request.GET.get('delivery_date'):
+        date_filter = request.GET.get('delivery_date')
+        all_doors = all_doors.filter(customer__delivery_date=date_filter)
+        context['filter'] += f", Delivery Date: {date_filter}"
+
+
+    context['doors'] = all_doors
+
+    return render(request, 'door_dashboard.html', context)
+

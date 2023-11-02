@@ -25,6 +25,9 @@ urlpatterns = [
     path('door_and_glass_selector/<int:door_id>/', views.door_and_glass_selector_view, name='door_and_glass_selector_view'),
     path('update_balance/', views.update_balance, name='update_balance'),
     path('update_priority/', views.update_priority, name='update_priority'),
+    path('show-pdf-for-day/', views.show_pdf_for_day, name='show_pdf_for_day'),
+    path('door_batch_dashboard/', views.door_batch_dashboard, name='door_batch_dashboard'),
+    path('doorwise-dashboard/', views.doorwise_dashboard, name='doorwise_dashboard'),
 
 
 

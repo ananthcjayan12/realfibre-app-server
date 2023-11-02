@@ -4,15 +4,24 @@
 
 <div class="container-fluid">
     <!-- Main Header -->
-    <div class="row py-4" style="background-color: #004165; color: #ffffff;">
-        <div class="col-md-9">
-            <h2 class="mb-0">Admin Dashboard</h2>
-            <small>Manage customer orders and balances</small>
-        </div>
-        <div class="col-md-3 text-md-right mt-2 mt-md-0">
-            <a href="{% url 'create_agent' %}" class="btn btn-outline-light">Add Agent</a>
+<!-- Main Header -->
+<div class="row py-4" style="background-color: #004165; color: #ffffff;">
+    <div class="col-md-7">
+        <h2 class="mb-0">Admin Dashboard</h2>
+        <small class="d-block mt-1">Manage customer orders and balances</small>
+    </div>
+    <div class="col-md-5 text-md-right d-flex align-items-center justify-content-end">
+        <div class="btn-group" role="group">
+            <a href="{% url 'create_agent' %}" class="btn btn-outline-light px-4 py-2 mr-2">Add Agent</a>
+            <a href="{% url 'doorwise_dashboard' %}" class="btn btn-outline-light px-4 py-2 mr-2">Dashboard for Doors</a>
+            <a href="{% url 'door_batch_dashboard' %}" class="btn btn-outline-light px-4 py-2">Door Batch Dashboard</a>
         </div>
     </div>
+</div>
+
+
+
+
 
     <div class="row mt-4">
         <!-- Sidebar for Filters -->

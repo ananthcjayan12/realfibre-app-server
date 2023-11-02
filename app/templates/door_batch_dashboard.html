@@ -1,0 +1,67 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+
+<div class="container-fluid">
+    <!-- Main Header -->
+    <div class="row py-4" style="background-color: #004165; color: #ffffff;">
+        <div class="col-md-12">
+            <h2 class="mb-0">Dashboard - Today's Batch</h2>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <!-- Main content for Doors List -->
+        <div class="col-md-12">
+            <div class="card border-left-info shadow">
+                <div class="card-body">
+                    <h3 class="card-title mb-4" style="color: #0056b3;">Doors</h3>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Door ID</th>
+                                    <th>Customer</th>
+                                    <th>Model</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for door in batch.doors.all %}
+                                <tr>
+                                    <td>{{ door.id }}</td>
+                                    <td>{{ door.customer.name }}</td>
+                                    <td>{{ door.model_selection.model_name }}</td>
+                                    <td>
+                                        <form method="post" action="{% url 'door_batch_dashboard' %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="door_id" value="{{ door.id }}">
+                                            <button type="submit" name="remove_door" class="btn btn-outline-danger btn-sm">Remove</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-4">
+                        <!-- Actions -->
+                        <form method="post" action="{% url 'door_batch_dashboard' %}" class="d-inline-block mr-2">
+                            {% csrf_token %}
+                            <button type="submit" name="reset_batch" class="btn btn-info">Reset Batch & Prepare Again</button>
+                        </form>
+                        <form method="post" action="{% url 'door_batch_dashboard' %}" class="d-inline-block mr-2">
+                            {% csrf_token %}
+                            <button type="submit" name="complete_batch" class="btn btn-success">Mark Batch as Complete</button>
+                        </form>
+                        <form method="get" action="{% url 'show_pdf_for_day' %}" class="d-inline-block">
+                            <button type="submit" name="show_pdf_for_day" class="btn btn-secondary">Print PDF</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
