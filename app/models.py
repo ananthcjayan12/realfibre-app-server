@@ -1,5 +1,6 @@
 from django.db import models
 from datetime import date, timedelta
+import json
 
 
 class Customer(models.Model):
@@ -260,37 +261,11 @@ class DoorBatch(models.Model):
     def create_batch_for_today(cls):
         todays_batch, created = cls.objects.get_or_create(date=date.today())
         if created:  # if a new batch was created for today
+            filename = 'mould_data.json'
+                # Load the data from the JSON file
+            with open(filename, 'r') as file:
+                mold_data = json.load(file)
             # Use the logic from your 'show_pdf_for_day' view to populate the batch:
-            mold_data = {
-                "astoni": 1,
-                "cloud": 4,
-                "delta": 4,
-                "flora": 1,
-                "horizon": 2,
-                "hexa": 6,
-                "liva": 2,
-                "milton": 2,
-                "mars": 1,
-                "petra": 3,
-                "periyar": 2,
-                "regal": 1,
-                "rectaglass": 2,  # Assuming 'recta' corresponds to 'rectaglass' in the mold list
-                "regency": 4,
-                "rivera": 5,
-                "spasio": 5,
-                "skill": 3,
-                "simplon": 2,
-                "vector": 2,
-                "venues": 2,
-                "wexco": 2,
-                "richmond": 3,  # Assuming 'richmound' corresponds to 'richmond' in the mold list
-                "wayanad": 3,
-                "vetrix": 1,
-                "triangle": 0,
-                "narrow": 0,
-                "wexcoglass": 0,
-            }
-
             all_doors = (
                 Door.objects.filter(finished=False)
                 .filter(customer__form_complete=True)

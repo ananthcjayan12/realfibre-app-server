@@ -560,37 +560,11 @@ def update_priority(request):
 from django.db.models import Q
 
 def show_pdf_for_day(request):
-    mold_data = {
-    'astoni': 1,
-    'cloud': 4,
-    'delta': 4,
-    'flora': 1,
-    'horizon': 2,
-    'hexa': 6,
-    'liva': 2,
-    'milton': 2,
-    'mars': 1,
-    'petra': 3,
-    'periyar': 2,
-    'regal': 1,
-    'rectaglass': 2,  # Assuming 'recta' corresponds to 'rectaglass' in the mold list
-    'regency': 4,
-    'rivera': 5,
-    'spasio': 5,
-    'skill': 3,
-    'simplon': 2,
-    'vector': 2,
-    'venues': 2,
-    'wexco': 2,
-    'richmond': 3,  # Assuming 'richmound' corresponds to 'richmond' in the mold list
-    'wayanad': 3,
-    'vetrix': 1,
-    'triangle': 0,
-    'narrow': 0,
-    'wexcoglass': 0
-}
-
-
+    # Path to the JSON file
+    filename = 'mould_data.json'
+    # Load the data from the JSON file
+    with open(filename, 'r') as file:
+        mold_data = json.load(file)
     today = date.today()
     try:
         existing_batch = DoorBatch.objects.get(date=today)
