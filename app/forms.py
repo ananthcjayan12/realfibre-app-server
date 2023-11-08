@@ -1,5 +1,5 @@
 from django import forms
-from .models import Customer, Door, Measurement, Hinge, Lock, Finish, DoorOpen, Frame
+from .models import Customer, Door, Measurement, Hinge, Lock, Finish, DoorOpen, Frame,Remarks
 from django.contrib.auth.models import User
 
 class CustomerForm(forms.ModelForm):
@@ -11,6 +11,14 @@ class MeasurementForm(forms.ModelForm):
     class Meta:
         model = Measurement
         fields = ['top', 'bottom', 'height']
+
+class RemarksForm(forms.ModelForm):
+    class Meta:
+        model = Remarks
+        fields = ['remarks']
+        widgets = {
+            'remarks': forms.Textarea(attrs={'rows': 4, 'cols': 40}),  # You can adjust rows and cols as needed
+        }
 
 class HingeForm(forms.ModelForm):
     class Meta:

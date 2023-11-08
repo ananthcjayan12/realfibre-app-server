@@ -28,7 +28,7 @@ urlpatterns = [
     path('show-pdf-for-day/', views.show_pdf_for_day, name='show_pdf_for_day'),
     path('door_batch_dashboard/', views.door_batch_dashboard, name='door_batch_dashboard'),
     path('doorwise-dashboard/', views.doorwise_dashboard, name='doorwise_dashboard'),
-
+    path('remarks/<int:door_id>/', views.remarks, name='remarks'),
 
 
 

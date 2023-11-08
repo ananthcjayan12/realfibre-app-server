@@ -56,7 +56,8 @@
                                     <th>Name</th>
                                     <th>Due Date</th>
                                     <th>Glass Selection</th> <!-- New column -->
-                                    <th>Door Model</th>     <!-- New column -->
+                                    <th>Door Model</th>
+                                    <th>Remarks</th>      <!-- New column -->
                                     <th>Finished</th>       <!-- New column -->
                                    
                                 </tr>
@@ -68,7 +69,8 @@
                                     <td>{{ door.customer.name }}</td>
                                     <td>{{ door.customer.delivery_date }}</td>
                                     <td>{{ door.glass_type_selection }}</td> <!-- New data cell -->
-                                    <td>{{ door.model_selection }}</td>                 <!-- Assuming door has a model field -->
+                                    <td>{{ door.model_selection }}</td>
+                                    <td>{{ door.remark_selection }}</td>                  <!-- Assuming door has a model field -->
                                     <td>{{ door.finished }}</td>              <!-- New data cell -->
                                 </tr>
                                 {% endfor %}

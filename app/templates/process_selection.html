@@ -97,6 +97,18 @@
         </div>
     </div>
 </div>
+<div class="col-md-4 mb-4">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">
+                <span class="{{ doors.remark_selection|yesno:'text-success,text-danger' }}">&#9679;</span>
+                Remarks
+            </h5>
+            <p class="card-text">Add any remarks</p>
+            <a href="{% url 'remarks' doors.id %}" class="btn btn-primary">Go</a>
+        </div>
+    </div>
+</div>
 <div class="mt-4 text-center">
     <a href="{% url 'door_selection' doors.customer.id %}" class="btn btn-secondary">Back to Door Selection</a>
 </div>

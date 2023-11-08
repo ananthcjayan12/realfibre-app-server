@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import *
-from .forms import CustomerForm, MeasurementForm, HingeForm, LockForm, FinishForm, DoorOpenForm, FrameForm, AdvancePaymentForm,DoorForm ,AgentCreationForm,CustomerFilterForm,UpdatePriorityForm
+from .forms import CustomerForm, MeasurementForm, HingeForm, LockForm, FinishForm, DoorOpenForm, FrameForm, AdvancePaymentForm,DoorForm ,RemarksForm,AgentCreationForm,CustomerFilterForm,UpdatePriorityForm
 from django.http import HttpResponseForbidden
 from django.contrib import messages
 import json
@@ -11,7 +11,7 @@ from django.templatetags.static import static
 
 FRAME_ADJUSTMENTS = {
     'Small': (-7.3, -7.3, -4.3),
-    'Normal': (-7.3, -7.3, -4.8),
+    'Normal': (-7.8, -7.8, -4.8),
     'Medium': (-7.3, -7.3, -4.3),
     'Heavy': (-11, -11, -6.3),
     'Door Without Clearence': (0, 0, 0),
@@ -74,6 +74,7 @@ def door_selection(request, customer_id):
         'customer': customer,
         'doors': doors,
         'show_submit_order_button': all_doors_completed and not customer.form_complete and no_of_doors != 0  and customer.delivery_date,
+        'form_complete':customer.form_complete,
         'formatted_date':formatted_date
     }
     
@@ -109,12 +110,32 @@ def measurement(request, door_id):
             door.measurement = measurement
             measurement.save()
             door.save()
-            return redirect('process_selection', door_id=door.id)
+            return redirect('door_and_glass_selector_view', door_id=door.id)
     else:
         form = MeasurementForm(instance=existing_measurement)
         print(form.instance)
 
     return render(request, 'measurement.html', {'door': door, 'form': form})
+
+@login_required
+def remarks(request, door_id):
+    door = get_object_or_404(Door, id=door_id)
+    existing_remarks = door.remark_selection
+
+    if request.method == 'POST':
+        form = RemarksForm(request.POST, instance=existing_remarks)
+        if form.is_valid():
+            remark = form.save(commit=False)
+            remark.door = door  # Set the door instance
+            remark.save()
+            door.remark_selection = remark
+            door.save()
+            return redirect('door_selection', customer_id=door.customer.id)
+    else:
+        form = RemarksForm(instance=existing_remarks)
+
+    return render(request, 'remarks.html', {'door': door, 'form': form})
+
 
 @login_required
 def select_hinge(request, door_id):
@@ -128,7 +149,7 @@ def select_hinge(request, door_id):
             door.hinge_selection = hinge
             hinge.save()
             door.save()
-            return redirect('process_selection', door_id=door.id)
+            return redirect('lock_selection', door_id=door.id)
     else:
         form = HingeForm(instance=hinge_instance)
 
@@ -147,7 +168,7 @@ def lock_selection(request, door_id):
             door.lock_selection = lock
             lock.save()
             door.save()
-            return redirect('process_selection', door_id=door.id)
+            return redirect('finish_selection', door_id=door.id)
     else:
         form = LockForm(instance=lock_instance)
 
@@ -173,7 +194,7 @@ def finish_selection(request, door_id):
             door.finish_selection = finish
             finish.save()
             door.save()
-            return redirect('process_selection', door_id=door.id)
+            return redirect('door_open_selection', door_id=door.id)
     else:
         form = FinishForm(instance=finish_instance)
 
@@ -212,7 +233,7 @@ def door_open_selection(request, door_id):
             door.door_open_selection = door_open
             door_open.save()
             door.save()
-            return redirect('process_selection', door_id=door.id)
+            return redirect('frame_selection', door_id=door.id)
     else:
         form = DoorOpenForm(instance=door_open_instance)
 
@@ -255,7 +276,7 @@ def frame_selection(request, door_id):
             frame.save()
             door.frame_selection = frame
             door.save()
-            return redirect('process_selection', door_id=door.id)  # Redirect back to the process selection
+            return redirect('remarks', door_id=door.id)
 
     else:
         form = FrameForm(instance=instance)
@@ -453,7 +474,7 @@ def door_and_glass_selector_view(request,door_id):
             door_instance.glass_type_selection = None
 
         door_instance.save()
-        return redirect('process_selection', door_id=door_instance.id)  # Redirect back to the process selection
+        return redirect('select_hinge', door_id=door_instance.id)  # Redirect back to the process selection
 
 
     # List of door names (extracted from your image filenames)

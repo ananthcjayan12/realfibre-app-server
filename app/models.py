@@ -52,6 +52,9 @@ class Door(models.Model):
     frame_selection = models.OneToOneField(
         "Frame", on_delete=models.SET_NULL, blank=True, null=True
     )
+    remark_selection= models.OneToOneField(
+        "Remarks", on_delete=models.SET_NULL, blank=True, null=True,related_name="doors"
+    )
     model_selection = models.OneToOneField(
         "DoorModel",
         on_delete=models.SET_NULL,
@@ -215,6 +218,13 @@ class PrimaryColour(models.Model):
 
     def __str__(self):
         return self.color_name
+
+class Remarks(models.Model):
+    door = models.ForeignKey(Door, on_delete=models.CASCADE)
+    remarks = models.CharField(max_length=10000)
+
+    def __str__(self):
+        return self.remarks
 
 
 class SecondaryColour(models.Model):
