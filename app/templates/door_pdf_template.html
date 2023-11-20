@@ -40,6 +40,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 30px;
+            
         }
 
         th, td {
@@ -47,7 +48,7 @@
             padding: 5px 5px;
             font-size: 10px;
             word-wrap: break-word;  /* Ensures that the content fits inside the table */
-            max-width: 200px;  /* Set a max-width to ensure columns don't stretch too much */
+            width: 90px;  /* Set a max-width to ensure columns don't stretch too much */
         }
 
         th {
@@ -62,7 +63,7 @@
     <table style="width: 100%;">
         <tr>
             <td style="width: 50%;">
-                <p><strong>Order No:</strong> {{ customer.order_no }}</p>
+                <p><strong>Order No:</strong> {{ customer.id }}</p>
                 <p><strong>Customer:</strong> {{ customer.name }}</p>
                 <p><strong>Party Name:</strong> {{ customer.party_name }}</p>
                 <p><strong>Address:</strong> {{ customer.location}}</p>
@@ -82,7 +83,7 @@
         <!-- Table headers -->
         <thead>
             <tr>
-                <th>SL.No</th>
+                <th >SL.No</th>
                 <th>Measurement</th>
                 <th>Door Model Selection</th>
                 <th>Door Glass Selection</th>
@@ -99,7 +100,7 @@
         <tbody>
             {% for door in customer.doors.all %}  <!-- Assuming a ForeignKey relationship from Door to Customer -->
             <tr>
-                <td>{{ forloop.counter }}</td>
+                <td style="max-width: 5px;">{{ forloop.counter }}</td>
                 <td>{{ door.measurement }}</td>
                 <td>{{ door.model_selection }}</td>
                 <td>{{ door.glass_type_selection }}</td>

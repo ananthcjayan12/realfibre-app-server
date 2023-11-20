@@ -269,9 +269,10 @@ def frame_selection(request, door_id):
             frame = form.save(commit=False)
             adjustment = FRAME_ADJUSTMENTS.get(frame.type)
             if adjustment:
-                frame.top_measurement = door.measurement.top + adjustment[0]
-                frame.breadth_measurement = door.measurement.bottom + adjustment[1]
-                frame.height_measurement = door.measurement.height + adjustment[2]
+                frame.top_measurement = round(door.measurement.top + adjustment[0], 2)
+                frame.breadth_measurement = round(door.measurement.bottom + adjustment[1], 2)
+                frame.height_measurement = round(door.measurement.height + adjustment[2], 2)
+
             
             frame.save()
             door.frame_selection = frame

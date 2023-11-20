@@ -96,6 +96,7 @@
         <p>You can't edit a form once it is submitted. Please contact the office to reactivate.</p>
       </div>
       <div class="modal-footer">
+        <a href="{% url 'door_pdf' customer.id %}" class="btn btn-secondary">View PDF</a>
         <a href="{% url 'home' %}" class="btn btn-secondary">Go back to home</a>
       </div>
     </div>

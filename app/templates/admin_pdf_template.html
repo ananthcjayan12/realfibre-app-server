@@ -40,6 +40,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 30px;
+            
         }
 
         th, td {
@@ -47,7 +48,7 @@
             padding: 5px 5px;
             font-size: 10px;
             word-wrap: break-word;  /* Ensures that the content fits inside the table */
-            max-width: 200px;  /* Set a max-width to ensure columns don't stretch too much */
+            width: 90px;  /* Set a max-width to ensure columns don't stretch too much */
         }
 
         th {
@@ -62,7 +63,7 @@
     <table style="width: 100%;">
         <tr>
             <td style="width: 50%;">
-                <p><strong>Order No:</strong> {{ customer.order_no }}</p>
+                <p><strong>Order No:</strong> {{ customer.id }}</p>
                 <p><strong>Customer:</strong> {{ customer.name }}</p>
                 <p><strong>Party Name:</strong> {{ customer.party_name }}</p>
                 <p><strong>Address:</strong> {{ customer.location}}</p>

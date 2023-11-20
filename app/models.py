@@ -1,6 +1,7 @@
 from django.db import models
 from datetime import date, timedelta
 import json
+import traceback
 
 
 class Customer(models.Model):
@@ -282,10 +283,13 @@ class DoorBatch(models.Model):
                 .order_by("customer__delivery_date")
             )
             for door in all_doors:
-                model_name = door.model_selection.model_name.lower()
-                if model_name in mold_data and mold_data[model_name] > 0:
-                    todays_batch.doors.add(door)
-                    mold_data[model_name] -= 1
+                try:
+                    model_name = door.model_selection.model_name.lower()
+                    if model_name in mold_data and mold_data[model_name] > 0:
+                        todays_batch.doors.add(door)
+                        mold_data[model_name] -= 1
+                except :
+                    print(traceback.format_exc(0))
         return todays_batch
 
     def __str__(self):
