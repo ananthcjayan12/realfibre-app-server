@@ -660,6 +660,11 @@ def doorwise_dashboard(request):
     if request.GET.get('glass_selected'):
         all_doors = all_doors.filter(glass_type_selection__isnull=False)
         context['filter'] += ", Doors with Glass Selection"
+    
+     # Check for 'door_without_clearance' filter
+    if 'door_without_clearance' in request.GET:
+        all_doors = all_doors.filter(frame_selection__type="Door Without Clearence")
+        context['filter'] += ", Doors with 'Door Without Clearance' Frame"
 
     # Check for 'delivery_date' filter
     if request.GET.get('delivery_date'):
