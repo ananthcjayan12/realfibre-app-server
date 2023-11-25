@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import (
     Customer, Measurement, Hinge, DoorModel, 
     ColorCombination, GlassType, Door, Lock, 
-    Finish, DoorOpen, Frame
+    Finish, DoorOpen, Frame ,MaterialRequirement
 )
 
 # Admin classes for each model to display all fields in the list view
@@ -39,6 +39,9 @@ class DoorOpenAdmin(admin.ModelAdmin):
 class FrameAdmin(admin.ModelAdmin):
     list_display = [field.name for field in Frame._meta.fields]
 
+class MaterialRequirementAdmin(admin.ModelAdmin):
+    list_display = [field.name for field in MaterialRequirement._meta.fields]
+
 # Registering models with their corresponding admin classes
 admin.site.register(Customer, CustomerAdmin)
 admin.site.register(Measurement, MeasurementAdmin)
@@ -51,3 +54,5 @@ admin.site.register(Lock, LockAdmin)
 admin.site.register(Finish, FinishAdmin)
 admin.site.register(DoorOpen, DoorOpenAdmin)
 admin.site.register(Frame, FrameAdmin)
+admin.site.register(MaterialRequirement, MaterialRequirementAdmin)
+

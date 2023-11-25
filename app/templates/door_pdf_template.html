@@ -94,6 +94,7 @@
                 <th>Finish Selection</th>
                 <th>Door Open Selection</th>
                 <th>Frame Selection</th>
+                <th>Remarks</th>
             </tr>
         </thead>
         <!-- Table body with dynamic data -->
@@ -111,6 +112,7 @@
                 <td>{{ door.finish_selection }}</td>
                 <td>{{ door.door_open_selection }}</td>
                 <td>{{ door.frame_selection.type }}</td>
+                <td>{{ door.remark_selection }}</td>
             </tr>
             {% endfor %}
         </tbody>

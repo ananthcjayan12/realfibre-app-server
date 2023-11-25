@@ -195,6 +195,10 @@ class Frame(models.Model):
 
     def __str__(self):
         return f"{self.get_type_display()} \n - T:{self.top_measurement}, B:{self.breadth_measurement}, H:{self.height_measurement}"
+    
+    def calculate_square_footage(self):
+        # Assuming the area is calculated as top_measurement * breadth_measurement
+        return (self.top_measurement * self.breadth_measurement)/390
 
 
 class DoorModel(models.Model):
@@ -294,3 +298,40 @@ class DoorBatch(models.Model):
 
     def __str__(self):
         return f"Batch for {self.date}"
+
+class MaterialRequirement(models.Model):
+    door = models.OneToOneField(Door, on_delete=models.CASCADE, related_name='material_requirement')
+    total_resin = models.FloatField()
+    cotting_resin = models.FloatField()
+    gelcoat = models.FloatField()
+    pigment = models.FloatField()
+    putty_total = models.FloatField()
+    putty_resin = models.FloatField()
+    cilica_pwdr = models.FloatField()
+    chalk_pwdr = models.FloatField()
+
+    @staticmethod
+    def calculate_materials(square_footage):
+        # Calculation logic based on square footage
+        return {
+            'total_resin': 235 * square_footage,
+            'cotting_resin': 50 * square_footage, # Part of total resin
+            'gelcoat': 50 * square_footage,       # Part of total resin
+            'pigment': 15 * square_footage,       # Part of total resin
+            'putty_total': 100 * square_footage,
+            'putty_resin': 50 * square_footage,   # Part of putty total
+            'cilica_pwdr': 40 * square_footage,   # Part of putty total
+            'chalk_pwdr': 10 * square_footage     # Part of putty total
+        }
+    
+    @classmethod
+    def create_or_update_for_door(cls, door):
+        if door.frame_selection:
+            square_footage = door.frame_selection.calculate_square_footage()
+            material_data = cls.calculate_materials(square_footage)
+
+            obj, created = cls.objects.update_or_create(
+                door=door,
+                defaults=material_data
+            )
+            return obj

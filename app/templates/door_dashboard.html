@@ -10,6 +10,16 @@
             <small>Manage door orders</small>
             <p><strong>Filter Applied:</strong> {{ filter }}</p>
         </div>
+        <div class="col-md-5">
+            <div class="btn-group" role="group">
+                <a href="{% url 'print_pdf' 'filtered_doors' %}" class="btn btn-outline-light">Prepare PDF</a>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="btn-group" role="group">
+                <a href="{% url 'print_pdf_materials' 'filtered_doors' %}" class="btn btn-outline-light">Prepare PDF with Materials</a>
+            </div>
+        </div>
     </div>
 
     <div class="row mt-4">

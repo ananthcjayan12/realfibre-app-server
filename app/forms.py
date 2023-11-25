@@ -30,6 +30,7 @@ class LockForm(forms.ModelForm):
     ROUND_SUBTYPES = [('key', 'Key'), ('keyless', 'Keyless')]
     LATCH_SUBTYPES = [('normal', 'Normal'), ('spider_normal', 'Spider Normal'), ('spider_premium', 'Spider Premium')]
     MOTISLOCK_SUBTYPES = [('normal', 'Normal'), ('premium', 'Premium'), ('shortkey', 'Shortkey'), ('longkey', 'Longkey')]
+    ALLDROPLOCK_SUBTYPES = [('ALLdroplock', 'ALLdroplock')]
     
     sub_type = forms.ChoiceField(choices=ROUND_SUBTYPES + LATCH_SUBTYPES + MOTISLOCK_SUBTYPES)
 
@@ -47,7 +48,7 @@ class LockForm(forms.ModelForm):
         elif lock_type == 'Motislock':
             self.fields['sub_type'].choices = self.MOTISLOCK_SUBTYPES
         elif lock_type == 'ALLdroplock':
-            self.fields['sub_type'].choices = []
+            self.fields['sub_type'].choices =   self.ALLDROPLOCK_SUBTYPES
 
     def clean(self):
         cleaned_data = super().clean()
@@ -59,6 +60,8 @@ class LockForm(forms.ModelForm):
         elif lock_type == 'Latch' and sub_type not in dict(self.LATCH_SUBTYPES):
             self.add_error('sub_type', 'Invalid choice for Latch lock type.')
         elif lock_type == 'Motislock' and sub_type not in dict(self.MOTISLOCK_SUBTYPES):
+            self.add_error('sub_type', 'Invalid choice for Motislock type.')
+        elif lock_type == 'ALLdroplock' and sub_type not in dict(self.ALLDROPLOCK_SUBTYPES):
             self.add_error('sub_type', 'Invalid choice for Motislock type.')
 
         return cleaned_data

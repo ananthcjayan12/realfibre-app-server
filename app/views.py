@@ -40,7 +40,7 @@ def home(request):
         form = CustomerForm()
         query = request.GET.get('search', '')
         print(request.user)
-        customers = Customer.objects.filter(agent=request.user, name__icontains=query)[:5]  # Added search functionality and limited to first 5
+        customers = Customer.objects.filter(agent=request.user, name__icontains=query)[:5]  
 
     return render(request, 'home.html', {'customers': customers, 'form': form})
 
@@ -177,7 +177,8 @@ def lock_selection(request, door_id):
         'door': door,
         'round_subtypes': json.dumps(LockForm.ROUND_SUBTYPES),
         'latch_subtypes': json.dumps(LockForm.LATCH_SUBTYPES),
-        'motislock_subtypes': json.dumps(LockForm.MOTISLOCK_SUBTYPES)
+        'motislock_subtypes': json.dumps(LockForm.MOTISLOCK_SUBTYPES),
+        'alldroplock_subtypes': json.dumps(LockForm.ALLDROPLOCK_SUBTYPES)
     }
     
     return render(request, 'lock_selection.html', context)
@@ -277,6 +278,7 @@ def frame_selection(request, door_id):
             frame.save()
             door.frame_selection = frame
             door.save()
+            MaterialRequirement.create_or_update_for_door(door)
             return redirect('remarks', door_id=door.id)
 
     else:
@@ -639,7 +641,9 @@ def door_batch_dashboard(request):
         elif 'reset_batch' in request.POST:
             todays_batch.delete()
             return redirect('door_batch_dashboard') 
-
+    door_ids=list(todays_batch.doors.values_list('id', flat=True))
+    request.session['door_batch_ids'] = door_ids
+    print(door_ids)
     return render(request, 'door_batch_dashboard.html', {'batch': todays_batch})
 
 
@@ -673,8 +677,24 @@ def doorwise_dashboard(request):
         all_doors = all_doors.filter(customer__delivery_date=date_filter)
         context['filter'] += f", Delivery Date: {date_filter}"
 
+    door_ids = list(all_doors.values_list('id', flat=True))
+    request.session['filtered_doors'] = door_ids
+
 
     context['doors'] = all_doors
 
     return render(request, 'door_dashboard.html', context)
 
+
+def print_pdf(request,session_name):
+    door_ids = request.session.get(session_name, [])
+    doors = Door.objects.filter(id__in=door_ids)
+    customers = {door.customer for door in doors}  
+    return render_pdf('print_pdf.html', {'doors': doors, 'customers': customers})
+
+
+def print_pdf_materials(request,session_name):
+    door_ids = request.session.get(session_name, [])
+    doors = Door.objects.filter(id__in=door_ids)
+    customers = {door.customer for door in doors}  
+    return render_pdf('print_pdf_materials.html', {'doors': doors, 'customers': customers})

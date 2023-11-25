@@ -58,6 +58,9 @@
                         <form method="get" action="{% url 'show_pdf_for_day' %}" class="d-inline-block">
                             <button type="submit" name="show_pdf_for_day" class="btn btn-secondary">Print PDF</button>
                         </form>
+                        <div class="btn-group" role="group">
+                            <a href="{% url 'print_pdf_materials' 'door_batch_ids' %}" class="btn btn-success">Prepare PDF with Materials</a>
+                        </div>
                     </div>
                 </div>
             </div>

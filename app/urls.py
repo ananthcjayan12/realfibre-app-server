@@ -29,6 +29,8 @@ urlpatterns = [
     path('door_batch_dashboard/', views.door_batch_dashboard, name='door_batch_dashboard'),
     path('doorwise-dashboard/', views.doorwise_dashboard, name='doorwise_dashboard'),
     path('remarks/<int:door_id>/', views.remarks, name='remarks'),
+     path('printpdf/<str:session_name>/', views.print_pdf, name='print_pdf'),
+     path('printpdfmaterials/<str:session_name>/', views.print_pdf_materials, name='print_pdf_materials'),
 
 
 
