@@ -312,17 +312,18 @@ class MaterialRequirement(models.Model):
 
     @staticmethod
     def calculate_materials(square_footage):
-        # Calculation logic based on square footage
+        # Calculation logic based on square footage with rounding to two decimal places
         return {
-            'total_resin': 235 * square_footage,
-            'cotting_resin': 50 * square_footage, # Part of total resin
-            'gelcoat': 50 * square_footage,       # Part of total resin
-            'pigment': 15 * square_footage,       # Part of total resin
-            'putty_total': 100 * square_footage,
-            'putty_resin': 50 * square_footage,   # Part of putty total
-            'cilica_pwdr': 40 * square_footage,   # Part of putty total
-            'chalk_pwdr': 10 * square_footage     # Part of putty total
+            'total_resin': round(235 * square_footage, 2),
+            'cotting_resin': round(50 * square_footage, 2), # Part of total resin
+            'gelcoat': round(50 * square_footage, 2),       # Part of total resin
+            'pigment': round(15 * square_footage, 2),       # Part of total resin
+            'putty_total': round(100 * square_footage, 2),
+            'putty_resin': round(50 * square_footage, 2),   # Part of putty total
+            'cilica_pwdr': round(40 * square_footage, 2),   # Part of putty total
+            'chalk_pwdr': round(10 * square_footage, 2)     # Part of putty total
         }
+
     
     @classmethod
     def create_or_update_for_door(cls, door):
