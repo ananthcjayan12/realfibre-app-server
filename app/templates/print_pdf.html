@@ -70,6 +70,7 @@
             <tr>
                 <th>SL.No</th>
                 <th>Customer Name</th>
+                <th>Party Name</th>
                 <th>Measurement</th>
                 <th>Door Model Selection</th>
                 <th>Door Glass Selection</th>
@@ -88,17 +89,18 @@
             {% for door in doors %}
             <tr>
                 <td>{{ forloop.counter }}</td>
+                <td>{{ door.customer.agent }}</td>
                 <td>{{ door.customer.name }}</td>
-                <td>H:{{ door.frame_selection.height_measurement }} ,  T:{{ door.frame_selection.top_measurement }} , B:{{ door.frame_selection.breadth_measurement }}</td>
+                <td>{{ door.measurement }}</td>
                 <td>{{ door.model_selection }}</td>
                 <td>{{ door.glass_type_selection }}</td>
                 <td>{{ door.primary_colour_selection }}</td>
                 <td>{{ door.secondary_colour_selection }}</td>
                 <td>{{ door.hinge_selection }}</td>
-                <td>{{ door.lock_selection }}</td>
+                <td>{{ door.lock_selection.type }} {{door.lock_selection.subtype}}</td>
                 <td>{{ door.finish_selection }}</td>
                 <td>{{ door.door_open_selection }}</td>
-                <td>{{ door.frame_selection.type }}</td>
+                <td>{{ door.frame_selection }}</td>
                 <td>{{ door.remark_selection }}</td>
                 
             </tr>

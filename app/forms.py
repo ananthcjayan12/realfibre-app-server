@@ -28,7 +28,7 @@ class HingeForm(forms.ModelForm):
 class LockForm(forms.ModelForm):
     
     ROUND_SUBTYPES = [('key', 'Key'), ('keyless', 'Keyless')]
-    LATCH_SUBTYPES = [('normal', 'Normal'), ('spider_normal', 'Spider Normal'), ('spider_premium', 'Spider Premium')]
+    LATCH_SUBTYPES = [('normal', 'Normal'), ('Spider Normal', 'Spider Normal'), ('Spider Premium', 'Spider Premium')]
     MOTISLOCK_SUBTYPES = [('normal', 'Normal'), ('premium', 'Premium'), ('shortkey', 'Shortkey'), ('longkey', 'Longkey')]
     ALLDROPLOCK_SUBTYPES = [('ALLdroplock', 'ALLdroplock')]
     
