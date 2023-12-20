@@ -482,7 +482,7 @@ def door_and_glass_selector_view(request,door_id):
 
     # List of door names (extracted from your image filenames)
     doors = [
-        "petra", "triangle", "astonia", "cloud", "delta", "flora", "hexa", "horizon", "liva", "mars", "milton",
+        "orbit","petra", "triangle", "astonia", "cloud", "delta", "flora", "hexa", "horizon", "liva", "mars", "milton",
         "narrow", "periyar", "rectaglass", "regal", "regency", "richmond", "rivera", "simplon", "skill",
         "spasio", "vector", "venues", "vetrix", "wayanad", "wexco", "wexcoglass","venuesglass"
     ]
@@ -509,7 +509,7 @@ def door_and_glass_selector_view(request,door_id):
     door_images_json = json.dumps(door_images_js)
     door_glass_mapping_json = json.dumps(door_glass_mapping_js) 
     colors = [
-    "coffee", "darkgrey", "eeti", "leatherfinish", "lightgrey", "mahagani",
+    "black", "darkgrey", "eeti", "leatherfinish", "lightgrey", "mahagani",
     "teakwooddark", "teakwoodlight", "white"
 ]
     color_images_js = {color: static(f'colours/{color}.png') for color in colors}
