@@ -78,7 +78,7 @@
         <tbody>
             {% for door in doors %}
             <tr>
-                <td>{{ forloop.counter }}</td>
+                <td>{{ door.customer.id }} / {{door.id}}</td>
         
                 <td>{{ door.customer.agent }}</td>
                 <td>{{ door.customer.name }}</td>
