@@ -29,7 +29,7 @@
                             <tbody>
                                 {% for door in batch.doors.all %}
                                 <tr>
-                                    <td>{{ door.customer.id }}/{{ door.id }}</td>
+                                    <td>{{ door.customer.id }}/{{ door.get_order_number }}</td>
                                     <td>{{ door.customer.name }}</td>
                                     <td>{{ door.model_selection.model_name }}</td>
                                     <td>

@@ -128,6 +128,10 @@ class Door(models.Model):
         # Since secondary_colour_selection and glass_type_selection are optional,
         # their presence or absence doesn't affect the completion status
         return True
+    
+    def get_order_number(self):
+        # Get the count of doors for this customer with a lower id than this door
+        return Door.objects.filter(customer=self.customer, id__lt=self.id).count() + 1
 
 
 class Measurement(models.Model):
