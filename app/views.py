@@ -40,7 +40,8 @@ def home(request):
         form = CustomerForm()
         query = request.GET.get('search', '')
         print(request.user)
-        customers = Customer.objects.filter(agent=request.user, name__icontains=query)[:5]  
+        customers = Customer.objects.filter(agent=request.user, name__icontains=query).order_by('-id')[:10]
+
 
     return render(request, 'home.html', {'customers': customers, 'form': form})
 
@@ -484,7 +485,7 @@ def door_and_glass_selector_view(request,door_id):
     doors = [
         "orbit","petra", "triangle", "astonia", "cloud", "delta", "flora", "hexa", "horizon", "liva", "mars", "milton",
         "narrow", "periyar", "rectaglass", "regal", "regency", "richmond", "rivera", "simplon", "skill",
-        "spasio", "vector", "venues", "vetrix", "wayanad", "wexco", "wexcoglass","venuesglass"
+        "spasio", "vector", "venues", "vetrix", "wayanad", "wexco", "wexcoglass","venuesglass","plainglass"
     ]
 
     # Dictionary mapping doors to their associated glasses
@@ -510,7 +511,7 @@ def door_and_glass_selector_view(request,door_id):
     door_glass_mapping_json = json.dumps(door_glass_mapping_js) 
     colors = [
     "black", "darkgrey", "eeti", "leatherfinish", "lightgrey", "mahagani",
-    "teakwooddark", "teakwoodlight", "white"
+    "teakwooddark", "teakwoodlight", "white","coffee"
 ]
     color_images_js = {color: static(f'colours/{color}.png') for color in colors}
     colors_mapping_json = json.dumps(color_images_js)
