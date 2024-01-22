@@ -495,7 +495,7 @@ def door_and_glass_selector_view(request,door_id):
     "simplon": [f"PK{i:02}" for i in range(1, 11)],  # PK01 to PK10
     "hexa": [f"XA{i:02}" for i in range(1, 10)],  # XA01 to XA09
     "wexcoglass": [f"GL{i:02}" for i in range(1, 11)],  # GL01 to GL10
-    "rectaglass": [f"GL{i:02}" for i in range(11, 21)],  # GL11 to GL20
+    "rectaglass": [f"GL{i:02}" for i in range(1, 21)],  # GL11 to GL20
     "vector": [f"TR{i:02}" for i in range(1, 11)],  # TR01 to TR10
     "horizon": [f"RZ{i:02}" for i in range(1, 13)],  # RZ01 to RZ12
     "astonia": [f"TB{i:02}" for i in range(1, 11)],  # TB01 to TB10
