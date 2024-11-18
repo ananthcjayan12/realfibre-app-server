@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid">
+    <div class="row py-4 bg-light text-center">
+        <div class="col-md-12">
+            <h2>Door and Glass Selection</h2>
+            <small class="text-muted">Select a door, its associated glass, and colors</small>
+        </div>
+    </div>
+    <form method="post" action="{% url 'door_and_glass_selector_view' door_instance.id %}">
+        {% csrf_token %}
+    <div class="row mt-5 justify-content-center">
+
+        <!-- Door Selection -->
+        <div class="col-12 col-md-5 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <label for="doorSelect">Select Door:</label>
+                    <select name="doormodel" id="doorSelect" class="form-control mb-3" onchange="updateDoorImage()">
+                        <option value="">--Select a Door--</option>
+                        {% for door in doors %}
+                            <option value="{{ door }}" {% if door == current_door_model %}selected{% endif %}>{{ door }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="text-center">
+                        <img id="doorImage" class="img-fluid" src="" alt="Selected Door Image">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Glass Selection -->
+        <div class="col-12 col-md-5 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <label for="glassSelect">Select Glass:</label>
+                    
+                    <select name="glasstype" id="glassSelect" class="form-control mb-3" onchange="updateGlassImage()" disabled>
+                        
+                        {% if current_glass_type %}
+                        
+                        <option value="{{ current_glass_type }}" selected>{{ current_glass_type }}</option>
+                    {% endif %}
+                    </select>
+                    <div class="text-center">
+                        <img id="glassImage" class="img-fluid" src="" alt="Selected Glass Image">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Primary Color Selection -->
+        <div class="col-12 col-md-5 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <label  for="primaryColorSelect">Select Primary Color:</label>
+                    <select name="primarycolour" id="primaryColorSelect" class="form-control mb-3" onchange="updatePrimaryColorImage()">
+                        <option value="">--Select a Primary Color--</option>
+                        {% for color in colors %}
+                            <option value="{{ color }}" {% if color == current_primary_color %}selected{% endif %}>{{ color }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="text-center">
+                        <img id="primaryColorImage" class="img-fluid" src="" alt="Selected Primary Color Image">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Secondary Color Selection -->
+        <div class="col-12 col-md-5">
+            <div class="card">
+                <div class="card-body">
+                    <label  for="secondaryColorSelect">Select Secondary Color:</label>
+                    <select name="secondarycolour" id="secondaryColorSelect" class="form-control mb-3" onchange="updateSecondaryColorImage()">
+                        <option value="">None</option>
+                        {% for color in colors %}
+                            <option value="{{ color }}" {% if color == current_secondary_color %}selected{% endif %}>{{ color }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="text-center">
+                        <img id="secondaryColorImage" class="img-fluid" src="" alt="Selected Secondary Color Image">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-5 justify-content-center">
+        <button type="submit" class="btn btn-primary">Save Selections</button>
+    </div>
+</form>
+
+    <script id="doorImagesData" type="application/json">
+        {{ door_images_json|safe }}
+    </script>
+
+    <script id="doorGlassMappingData" type="application/json">
+        {{ door_glass_mapping_json|safe }}
+    </script>
+
+    <script id="colors_mappingData" type="application/json">
+        {{ colors_mapping_json|safe }}
+    </script>
+
+    
+</div>
+
+
+
+<script>
+    const doorImages = JSON.parse(document.getElementById('doorImagesData').textContent);
+    const doorGlassMapping = JSON.parse(document.getElementById('doorGlassMappingData').textContent);
+    const colorMapping = JSON.parse(document.getElementById('colors_mappingData').textContent);
+    console.log(colorMapping)
+
+    function updateDoorImage() {
+        const selectedDoor = document.getElementById("doorSelect").value;
+        const doorImageElement = document.getElementById("doorImage");
+        const glassSelectElement = document.getElementById("glassSelect");
+
+        doorImageElement.src = doorImages[selectedDoor] || "";
+        
+
+        if (doorGlassMapping[selectedDoor]) {
+            glassSelectElement.disabled = false;
+            glassSelectElement.innerHTML = '<option value="">--Select a Glass--</option>';
+            doorGlassMapping[selectedDoor].forEach(glass => {
+                let glassName = glass.split('/').pop().split('.')[0];  // Extracts 'EL01' from '/static/glass/EL01.png'
+                let option = new Option(glassName, glassName);
+
+                glassSelectElement.add(option);
+                
+            });
+        } else {
+            glassSelectElement.innerHTML = '<option value="">--Select a Glass--</option>';
+            glassSelectElement.disabled = true;
+            document.getElementById("glassImage").src = "";
+        }
+    }
+
+    
+
+    function updateGlassImage() {
+        const selectedDoor = document.getElementById("doorSelect").value;
+        const selectedGlass = document.getElementById("glassSelect").value;
+        if (selectedGlass) {
+            document.getElementById("glassImage").src = doorGlassMapping[selectedDoor].includes("/static/glass/" + selectedGlass + ".png") ? "/static/glass/" + selectedGlass + ".png" : "";
+
+        } else {
+            document.getElementById("glassImage").src = "";
+        }
+    }
+    function updatePrimaryColorImage() {
+    const selectedPrimaryColor = document.getElementById("primaryColorSelect").value;
+    const primaryColorImageElement = document.getElementById("primaryColorImage");
+
+    primaryColorImageElement.src = colorMapping[selectedPrimaryColor] || "";
+}
+
+function updateSecondaryColorImage() {
+    const selectedSecondaryColor = document.getElementById("secondaryColorSelect").value;
+    const secondaryColorImageElement = document.getElementById("secondaryColorImage");
+
+    secondaryColorImageElement.src = colorMapping[selectedSecondaryColor] || "";
+}
+document.addEventListener("DOMContentLoaded", function() {
+    updateDoorImage();
+    updateGlassImage();
+    updatePrimaryColorImage();
+    updateSecondaryColorImage();
+});
+
+    
+</script>
+
+{% endblock %}

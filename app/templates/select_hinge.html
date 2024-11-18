@@ -2,9 +2,9 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="text-center mb-4">Hinge Selection for {{ customer.name }}</h2>
+    <h2 class="text-center mb-4">Hinge Selection for {{ door.customer.name }}</h2>
     
-    {% if hinge_instance.pk %}
+    {% if door.hinge_selection.pk %}
     <div class="alert alert-info mb-4">
         You are updating the hinge selection.
     </div>

@@ -2,11 +2,11 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="text-center mb-4">Lock Selection for {{ customer.name }}</h2>
+    <h2 class="text-center mb-4">Lock Selection for {{ door.name }}</h2>
     
-    {% if customer.lock %}
+    {% if door.lock %}
     <div class="alert alert-info mb-4">
-        You are updating the lock selection.
+        You are updating the lock selection for this door.
     </div>
     {% endif %}
 
@@ -47,6 +47,7 @@
         const roundSubtypes = JSON.parse('{{ round_subtypes|escapejs }}');
         const latchSubtypes = JSON.parse('{{ latch_subtypes|escapejs }}');
         const motislockSubtypes = JSON.parse('{{ motislock_subtypes|escapejs }}');
+        const ALLdroplockSubtypes = JSON.parse('{{ alldroplock_subtypes|escapejs }}');
 
         function setSubtypeOptions(options) {
             subTypeSelect.innerHTML = '';
@@ -70,7 +71,7 @@
             } else if (typeSelect.value === "Motislock") {
                 setSubtypeOptions(motislockSubtypes);
             } else if (typeSelect.value === "ALLdroplock") {
-                setSubtypeOptions([]);
+                setSubtypeOptions(ALLdroplockSubtypes);
             }
         });
     });

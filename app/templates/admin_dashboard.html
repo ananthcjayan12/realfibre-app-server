@@ -1,0 +1,162 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+
+<div class="container-fluid">
+    <!-- Main Header -->
+<!-- Main Header -->
+<div class="row py-4" style="background-color: #004165; color: #ffffff;">
+    <div class="col-md-7">
+        <h2 class="mb-0">Admin Dashboard</h2>
+        <small class="d-block mt-1">Manage customer orders and balances</small>
+    </div>
+    <div class="col-md-5 text-md-right d-flex align-items-center justify-content-end">
+        <div class="btn-group" role="group">
+            <a href="{% url 'create_agent' %}" class="btn btn-outline-light px-4 py-2 mr-2">Add Agent</a>
+            <a href="{% url 'doorwise_dashboard' %}" class="btn btn-outline-light px-4 py-2 mr-2">Dashboard for Doors</a>
+            <a href="{% url 'door_batch_dashboard' %}" class="btn btn-outline-light px-4 py-2">Door Batch Dashboard</a>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+    <div class="row mt-4">
+        <!-- Sidebar for Filters -->
+        <div class="col-md-3">
+            <div class="card border-left-info shadow">
+                <div class="card-body">
+                    <h4 class="card-title mb-4" style="color: #0056b3;">Filter Options</h4>
+                    <form method="get">
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-info mb-2 w-100">Apply Filters</button>
+                        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary w-100">Clear Filters</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main content for Customers List -->
+        <div class="col-md-9">
+            <div class="card border-left-info shadow">
+                <div class="card-body">
+                    <h3 class="card-title mb-4" style="color: #0056b3;">Customers</h3>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Due Date</th>
+                                    <th>Status</th>
+                                    <th>Advance Paid</th>
+                                    <th>Balance Amount</th>
+                                    <th>Priority</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for customer in customers %}
+                                <tr>
+                                    <td>{{ customer.name }}</td>
+                                    <td>{{ customer.delivery_date }}</td>
+                                    <td>{{ customer.status }}</td>
+                                    <td>₹{{ customer.advance_paid }}</td>
+                                    <td>
+                                        <input type="number" id="balance_{{ customer.id }}" value="{{ customer.balance_amount }}" class="form-control form-control-sm" style="max-width: 100px; display: inline-block;">
+                                        ₹<span id="balance_text_{{ customer.id }}" style="display: none;">{{ customer.balance_amount }}</span>
+                                    </td>
+                                    <td>
+                                        <select onchange="updatePriority('{{ customer.id }}', this.value)" class="form-control form-control-sm">
+                                            {% for choice in customer.PRIORITY_CHOICES %}
+                                                <option value="{{ choice.0 }}" {% if customer.priority == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <button onclick="updateBalance('{{ customer.id }}')" class="btn btn-outline-info btn-sm">Save</button>
+                                        <a href="{% url 'mark_as_complete' customer.id %}" class="btn btn-outline-success btn-sm">Complete</a>
+                                        <a href="{% url 'show_pdf' customer.id %}" class="btn btn-outline-secondary btn-sm">PDF</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updateBalance(customerId) {
+        var newBalance = document.getElementById('balance_' + customerId).value;
+
+        fetch('{% url "update_balance" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+
+            },
+            body: JSON.stringify({
+                customer_id: customerId,
+                new_balance: newBalance,
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('balance_text_' + customerId).innerText = newBalance;
+                document.getElementById('balance_' + customerId).style.display = 'none';
+                document.getElementById('balance_text_' + customerId).style.display = 'inline';
+            } else {
+                alert('Failed to update balance');
+            }
+        })
+        .catch(error => {
+            console.error('Error updating balance:', error);
+            alert('Failed to update balance');
+        });
+    }
+
+    function updatePriority(customerId, newPriority) {
+
+        
+        fetch('{% url "update_priority" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+   
+            },
+            body: JSON.stringify({
+                customer_id: customerId,
+                new_priority: newPriority,
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Priority updated successfully');
+            } else {
+                alert('Failed to update priority');
+            }
+        })
+        .catch(error => {
+            console.error('Error updating priority:', error);
+            alert('Failed to update priority');
+        });
+    }
+
+</script>
+<script>
+    $(document).ready(function() {
+        $('#id_delivery_date_from, #id_delivery_date_to').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayHighlight: true
+        });
+    });
+    </script>
+{% endblock %}

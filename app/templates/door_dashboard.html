@@ -1,0 +1,100 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+
+<div class="container-fluid">
+    <!-- Main Header -->
+    <div class="row py-4" style="background-color: #004165; color: #ffffff;">
+        <div class="col-md-9">
+            <h2 class="mb-0">Doorwise Dashbodard</h2>
+            <small>Manage door orders</small>
+            <p><strong>Filter Applied:</strong> {{ filter }}</p>
+        </div>
+        <div class="col-md-5">
+            <div class="btn-group" role="group">
+                <a href="{% url 'print_pdf' 'filtered_doors' %}" class="btn btn-outline-light">Prepare PDF</a>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="btn-group" role="group">
+                <a href="{% url 'print_pdf_materials' 'filtered_doors' %}" class="btn btn-outline-light">Prepare PDF with Materials</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <!-- Sidebar for Filters -->
+        <div class="col-md-3">
+            <div class="card border-left-info shadow">
+                <div class="card-body">
+                    <h4 class="card-title mb-4" style="color: #0056b3;">Filter Options</h4>
+                    <form method="get">
+                        <!-- Filter by Finished -->
+                        <p>
+                            <label for="finished">Finished:</label><br>
+                            <select name="finished" id="finished">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </p>
+                        
+                        <!-- Filter by Glass Selection -->
+                        <p>
+                            <label><input type="checkbox" name="glass_selected" value="true"> Doors with Glass Selection</label>
+                        </p>
+                        <p>
+                            <label><input type="checkbox" name="door_without_clearance" value="true"> Doors with 'Door Without Clearance' Frame</label>
+                        </p>
+
+  
+
+                        <button type="submit" class="btn btn-info mb-2 w-100">Apply Filters</button>
+                        <a href="{% url 'doorwise_dashboard' %}" class="btn btn-outline-secondary w-100">Clear Filters</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main content for Doors List -->
+        <div class="col-md-9">
+            <div class="card border-left-info shadow">
+                <div class="card-body">
+                    <h3 class="card-title mb-4" style="color: #0056b3;">Doors</h3>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>SL NO</th>
+                                    <th>Name</th>
+                                    <th>Due Date</th>
+                                    <th>Glass Selection</th> <!-- New column -->
+                                    <th>Door Model</th>
+                                    <th>Remarks</th>      <!-- New column -->
+                                    <th>Finished</th>       <!-- New column -->
+                                   
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for door in doors %}
+                                <tr>
+                                    <td>{{ door.customer.id }}/{{ door.get_order_number }}</td>
+                                    <td>{{ door.customer.name }}</td>
+                                    <td>{{ door.customer.delivery_date }}</td>
+                                    <td>{{ door.glass_type_selection }}</td> <!-- New data cell -->
+                                    <td>{{ door.model_selection }}</td>
+                                    <td>{{ door.remark_selection }}</td>                  <!-- Assuming door has a model field -->
+                                    <td>{{ door.finished }}</td>              <!-- New data cell -->
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
