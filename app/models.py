@@ -340,3 +340,8 @@ class MaterialRequirement(models.Model):
                 defaults=material_data
             )
             return obj
+
+class YourModel(models.Model):
+    # This will automatically use the R2 storage backend
+    image = models.ImageField(upload_to='images/')
+    document = models.FileField(upload_to='documents/')

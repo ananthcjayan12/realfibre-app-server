@@ -128,7 +128,7 @@
             glassSelectElement.disabled = false;
             glassSelectElement.innerHTML = '<option value="">--Select a Glass--</option>';
             doorGlassMapping[selectedDoor].forEach(glass => {
-                let glassName = glass.split('/').pop().split('.')[0];  // Extracts 'EL01' from '/static/glass/EL01.png'
+                let glassName = glass.split('/').pop().split('.')[0];  // Extracts 'EL01' from '/media/glass/EL01.png'
                 let option = new Option(glassName, glassName);
 
                 glassSelectElement.add(option);
@@ -147,7 +147,7 @@
         const selectedDoor = document.getElementById("doorSelect").value;
         const selectedGlass = document.getElementById("glassSelect").value;
         if (selectedGlass) {
-            document.getElementById("glassImage").src = doorGlassMapping[selectedDoor].includes("/static/glass/" + selectedGlass + ".png") ? "/static/glass/" + selectedGlass + ".png" : "";
+            document.getElementById("glassImage").src = doorGlassMapping[selectedDoor].includes("/media/glass/" + selectedGlass + ".png") ? "/media/glass/" + selectedGlass + ".png" : "";
 
         } else {
             document.getElementById("glassImage").src = "";

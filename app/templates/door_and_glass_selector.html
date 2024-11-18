@@ -133,7 +133,7 @@
         const selectedDoor = document.getElementById("doorSelect").value;
         const selectedGlass = document.getElementById("glassSelect").value;
         if (selectedGlass) {
-            document.getElementById("glassImage").src = doorGlassMapping[selectedDoor].includes("/static/glass/" + selectedGlass + ".png") ? "/static/glass/" + selectedGlass + ".png" : "";
+            document.getElementById("glassImage").src = doorGlassMapping[selectedDoor].includes("/media/glass/" + selectedGlass + ".png") ? "/media/glass/" + selectedGlass + ".png" : "";
 
         } else {
             document.getElementById("glassImage").src = "";

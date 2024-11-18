@@ -8,6 +8,7 @@ import json
 from django.urls import reverse_lazy
 from django.contrib.auth.views import LoginView
 from django.templatetags.static import static
+from django.conf import settings
 
 FRAME_ADJUSTMENTS = {
     'Small': (-7.3, -7.3, -4.3),
@@ -443,7 +444,7 @@ def create_agent(request):
 from django.templatetags.static import static
 
 
-def door_and_glass_selector_view(request,door_id):
+def door_and_glass_selector_view(request, door_id):
     door_instance = get_object_or_404(Door, id=door_id)
 
     if request.method == 'POST':
@@ -504,9 +505,14 @@ def door_and_glass_selector_view(request,door_id):
 }
 
 
-    # Create the static paths for door images and their respective glasses
-    door_images_js = {door: static(f'doors/{door}.png') for door in doors}
-    door_glass_mapping_js = {door: [static(f'glass/{glass}.png') for glass in glasses] for door, glasses in door_glass_mapping.items()}
+    # Create the media paths for door images and their respective glasses
+    door_images_js = {door: f"{settings.MEDIA_URL}doors/{door}.png" for door in doors}
+    door_glass_mapping_js = {door: [f"{settings.MEDIA_URL}glass/{glass}.png" for glass in glasses] 
+                            for door, glasses in door_glass_mapping.items()}
+    
+    # Update color images to use media
+    color_images_js = {color: f"{settings.MEDIA_URL}colours/{color}.png" for color in colors}
+    
     door_images_json = json.dumps(door_images_js)
     door_glass_mapping_json = json.dumps(door_glass_mapping_js) 
     colors = [

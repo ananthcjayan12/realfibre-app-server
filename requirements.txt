@@ -35,3 +35,6 @@ webencodings==0.5.1
 xhtml2pdf==0.2.11
 gunicorn
 whitenoise==6.8.2
+django-storages
+boto3
+python-dotenv==1.0.0

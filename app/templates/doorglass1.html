@@ -126,24 +126,23 @@ function updateDoorImage() {
     document.getElementById("glassImage").src = "";
 
     if (doorGlassMapping[selectedDoor]) {
+        glassSelectElement.disabled = false;
+        glassSelectElement.innerHTML = '<option value="">--Select a Glass--</option>';
         doorGlassMapping[selectedDoor].forEach(glass => {
             let glassName = glass.split('/').pop().split('.')[0];
             let option = new Option(glassName, glassName);
             glassSelectElement.add(option);
         });
-        glassSelectElement.disabled = false;
-    } else {
-        glassSelectElement.disabled = true;
     }
 
-// Check for currentGlassType, ensure it's not "none", and ensure the image exists
+// Check for currentGlassType
 if (currentGlassType && 
     currentGlassType !== "none" && 
-    doorGlassMapping.hasOwnProperty(selectedDoor) && // Check if the key for the selected door exists
-    doorGlassMapping[selectedDoor].includes("/static/glass/" + currentGlassType + ".png")) {
+    doorGlassMapping.hasOwnProperty(selectedDoor) && 
+    doorGlassMapping[selectedDoor].includes("/media/glass/" + currentGlassType + ".png")) {
 
     glassSelectElement.value = currentGlassType; 
-    document.getElementById("glassImage").src = "/static/glass/" + currentGlassType + ".png";
+    document.getElementById("glassImage").src = "/media/glass/" + currentGlassType + ".png";
 } else {
     // Reset the image source if the conditions are not met
     document.getElementById("glassImage").src = "";
@@ -160,7 +159,7 @@ if (currentGlassType &&
         const selectedDoor = document.getElementById("doorSelect").value;
         const selectedGlass = document.getElementById("glassSelect").value;
         if (selectedGlass) {
-            document.getElementById("glassImage").src = doorGlassMapping[selectedDoor].includes("/static/glass/" + selectedGlass + ".png") ? "/static/glass/" + selectedGlass + ".png" : "";
+            document.getElementById("glassImage").src = doorGlassMapping[selectedDoor].includes("/media/glass/" + selectedGlass + ".png") ? "/media/glass/" + selectedGlass + ".png" : "";
 
         } else {
             document.getElementById("glassImage").src = "";
