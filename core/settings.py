@@ -25,8 +25,8 @@ SECRET_KEY = "django-insecure-xf7&gz7asn5s8%v$woe!pm3xmrv#%$bmxkqc5o%t15vzfu8lxy
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['realfibreglass.srshti.co.in','127.0.0.1','realfibre.srshti.co.in']
-CSRF_TRUSTED_ORIGINS = ['https://realfibreglass.srshti.co.in','https://realfibre.srshti.co.in']
+ALLOWED_HOSTS = ['realfibreglass.srshti.co.in','127.0.0.1','realfibre.srshti.co.in','http://s4wokksok84048kcwkossc8c.82.112.235.216.sslip.io']
+CSRF_TRUSTED_ORIGINS = ['https://realfibreglass.srshti.co.in','https://realfibre.srshti.co.in','http://s4wokksok84048kcwkossc8c.82.112.235.216.sslip.io']
 LOGIN_URL = 'agent_login'  # Assuming 'agent_login' is the name of your login view in urls.py
 LOGOUT_REDIRECT_URL = 'agent_login'  # Redirect to login page after logout for this example
 
