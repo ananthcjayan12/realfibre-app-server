@@ -503,15 +503,19 @@ def door_and_glass_selector_view(request, door_id):
     "liva": [f"AV{i:02}" for i in range(1, 12)],  # AV01 to AV11
     "venuesglass": [f"V{i:02}" for i in range(1, 10)]  # V01 to V09
 }
+    colors = [
+    "black", "darkgrey", "eeti", "leatherfinish", "lightgrey", "mahagani",
+    "teakwooddark", "teakwoodlight", "white","coffee"
+    ]
 
 
     # Create the media paths for door images and their respective glasses
-    door_images_js = {door: f"{settings.MEDIA_URL}doors/{door}.png" for door in doors}
-    door_glass_mapping_js = {door: [f"{settings.MEDIA_URL}glass/{glass}.png" for glass in glasses] 
+    door_images_js = {door: f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/doors/{door}.png" for door in doors}
+    door_glass_mapping_js = {door: [f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/glass/{glass}.png" for glass in glasses] 
                             for door, glasses in door_glass_mapping.items()}
     
-    # Update color images to use media
-    color_images_js = {color: f"{settings.MEDIA_URL}colours/{color}.png" for color in colors}
+    # Update color images to use AWS_S3_CUSTOM_DOMAIN
+    color_images_js = {color: f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/colours/{color}.png" for color in colors}
     
     door_images_json = json.dumps(door_images_js)
     door_glass_mapping_json = json.dumps(door_glass_mapping_js) 

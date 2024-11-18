@@ -135,37 +135,30 @@ function updateDoorImage() {
         });
     }
 
-// Check for currentGlassType
-if (currentGlassType && 
-    currentGlassType !== "none" && 
-    doorGlassMapping.hasOwnProperty(selectedDoor) && 
-    doorGlassMapping[selectedDoor].includes("/media/glass/" + currentGlassType + ".png")) {
-
-    glassSelectElement.value = currentGlassType; 
-    document.getElementById("glassImage").src = "/media/glass/" + currentGlassType + ".png";
-} else {
-    // Reset the image source if the conditions are not met
-    document.getElementById("glassImage").src = "";
-}
-
-}
-
-
-    
-
-    
-
-    function updateGlassImage() {
-        const selectedDoor = document.getElementById("doorSelect").value;
-        const selectedGlass = document.getElementById("glassSelect").value;
-        if (selectedGlass) {
-            document.getElementById("glassImage").src = doorGlassMapping[selectedDoor].includes("/media/glass/" + selectedGlass + ".png") ? "/media/glass/" + selectedGlass + ".png" : "";
-
-        } else {
-            document.getElementById("glassImage").src = "";
-        }
+    // Check for currentGlassType
+    if (currentGlassType && 
+        currentGlassType !== "none" && 
+        doorGlassMapping.hasOwnProperty(selectedDoor)) {
+        glassSelectElement.value = currentGlassType; 
+        document.getElementById("glassImage").src = `https://${doorGlassMapping[selectedDoor][0].split('/')[2]}/${currentGlassType}.png`;
+    } else {
+        document.getElementById("glassImage").src = "";
     }
-    function updatePrimaryColorImage() {
+}
+
+function updateGlassImage() {
+    const selectedDoor = document.getElementById("doorSelect").value;
+    const selectedGlass = document.getElementById("glassSelect").value;
+    if (selectedGlass && doorGlassMapping[selectedDoor]) {
+        // Use the domain from the first glass URL in the mapping
+        const domain = doorGlassMapping[selectedDoor][0].split('/')[2];
+        document.getElementById("glassImage").src = `https://${domain}/media/glass/${selectedGlass}.png`;
+    } else {
+        document.getElementById("glassImage").src = "";
+    }
+}
+
+function updatePrimaryColorImage() {
     const selectedPrimaryColor = document.getElementById("primaryColorSelect").value;
     const primaryColorImageElement = document.getElementById("primaryColorImage");
 
