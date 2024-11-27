@@ -31,20 +31,24 @@ class CustomLoginView(LoginView):
     
 @login_required
 def home(request):
+    # Initialize customers variable
+    customers = Customer.objects.filter(agent=request.user).order_by('-id')[:10]
+    
     if request.method == 'POST':
         form = CustomerForm(request.POST)
         if form.is_valid():
-            customer = form.save(commit=False)  # Temporarily prevent saving
-            customer.agent = request.user  # Assign the logged-in user to the agent field
+            customer = form.save(commit=False)
+            customer.agent = request.user
             customer.save()
-            return redirect('home')  # Redirect back to the home after saving
-
+            return redirect('home')
     else:
         form = CustomerForm()
         query = request.GET.get('search', '')
-        print(request.user)
-        customers = Customer.objects.filter(agent=request.user, name__icontains=query).order_by('-id')[:10]
-
+        if query:
+            customers = Customer.objects.filter(
+                agent=request.user, 
+                name__icontains=query
+            ).order_by('-id')[:10]
 
     return render(request, 'home.html', {'customers': customers, 'form': form})
 
