@@ -12,7 +12,7 @@ from django.conf import settings
 
 FRAME_ADJUSTMENTS = {
     'Small': (-7.3, -7.3, -4.3),
-    'Normal': (-7.8, -7.8, -4.8),
+    'Normal': (-8.0, -8.0, -4.8),
     'Medium': (-7.3, -7.3, -4.3),
     'Heavy': (-11, -11, -6.3),
     'Door Without Clearence': (0, 0, 0),
@@ -484,9 +484,11 @@ def door_and_glass_selector_view(request, door_id):
 
     # List of door names (extracted from your image filenames)
     doors = [
-        "orbit","petra", "triangle", "astonia", "cloud", "delta", "flora", "hexa", "horizon", "liva", "mars", "milton",
-        "narrow", "periyar", "rectaglass", "regal", "regency", "richmond", "rivera", "simplon", "skill",
-        "spasio", "vector", "venues", "vetrix", "wayanad", "wexco", "wexcoglass","venuesglass","plainglass"
+        "orbit", "petra", "triangle", "astonia", "cloud", "delta", "flora", "hexa", 
+        "horizon", "liva", "mars", "milton", "narrow", "periyar", "rectaglass", 
+        "regal", "regency", "richmond", "rivera", "simplon", "skill", "spasio", 
+        "vector", "venues", "vetrix", "wayanad", "wexco", "wexcoglass", "venuesglass",
+        "plainglass", "classic", "galaxy", "queen" , "royal"# Added the three new doors
     ]
 
     # Dictionary mapping doors to their associated glasses
@@ -504,8 +506,8 @@ def door_and_glass_selector_view(request, door_id):
     "venuesglass": [f"V{i:02}" for i in range(1, 10)]  # V01 to V09
 }
     colors = [
-    "black", "darkgrey", "eeti", "leatherfinish", "lightgrey", "mahagani",
-    "teakwooddark", "teakwoodlight", "white","coffee"
+        "black", "darkgrey", "eeti", "leatherfinish", "lightgrey", "mahagani",
+        "teakwooddark", "teakwoodlight", "white", "coffee", "offwhite", "ivory"
     ]
 
 
@@ -520,9 +522,9 @@ def door_and_glass_selector_view(request, door_id):
     door_images_json = json.dumps(door_images_js)
     door_glass_mapping_json = json.dumps(door_glass_mapping_js) 
     colors = [
-    "black", "darkgrey", "eeti", "leatherfinish", "lightgrey", "mahagani",
-    "teakwooddark", "teakwoodlight", "white","coffee"
-]
+        "black", "darkgrey", "eeti", "leatherfinish", "lightgrey", "mahagani",
+        "teakwooddark", "teakwoodlight", "white", "coffee", "offwhite", "ivory"
+    ]
     color_images_js = {color: static(f'colours/{color}.png') for color in colors}
     colors_mapping_json = json.dumps(color_images_js)
     current_door_model = door_instance.model_selection.model_name if door_instance.model_selection else None
