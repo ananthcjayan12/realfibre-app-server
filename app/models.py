@@ -2,6 +2,7 @@ from django.db import models
 from datetime import date, timedelta
 import json
 import traceback
+from django.utils import timezone
 
 
 class Customer(models.Model):
@@ -25,63 +26,67 @@ class Customer(models.Model):
     status = models.CharField(choices=STATUS_CHOICES, max_length=20, default="PENDING")
     priority = models.CharField(choices=PRIORITY_CHOICES, max_length=20, default="high")
 
+    @classmethod
+    def cleanup_old_data(cls):
+        """
+        Deletes customer data older than 6 months
+        Returns the number of deleted records
+        """
+        six_months_ago = timezone.now().date() - timedelta(days=180)
+        
+        # Get customers to delete
+        old_customers = cls.objects.filter(
+            order_date__lt=six_months_ago,
+            status="COMPLETE"
+        )
+        
+        count = old_customers.count()
+        old_customers.delete()  # This will cascade delete all related records
+        return count
+
     def __str__(self):
         return self.name
 
 
 class Door(models.Model):
-    customer = models.ForeignKey(
-        Customer, on_delete=models.CASCADE, related_name="doors"
-    )
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="doors")
 
     # Each process for a door
     measurement = models.OneToOneField(
-        "Measurement", on_delete=models.SET_NULL, blank=True, null=True
+        "Measurement", on_delete=models.CASCADE, blank=True, null=True
     )
     hinge_selection = models.OneToOneField(
-        "Hinge", on_delete=models.SET_NULL, blank=True, null=True
+        "Hinge", on_delete=models.CASCADE, blank=True, null=True
     )
     lock_selection = models.OneToOneField(
-        "Lock", on_delete=models.SET_NULL, blank=True, null=True
+        "Lock", on_delete=models.CASCADE, blank=True, null=True
     )
     finish_selection = models.OneToOneField(
-        "Finish", on_delete=models.SET_NULL, blank=True, null=True
+        "Finish", on_delete=models.CASCADE, blank=True, null=True
     )
     door_open_selection = models.OneToOneField(
-        "DoorOpen", on_delete=models.SET_NULL, blank=True, null=True
+        "DoorOpen", on_delete=models.CASCADE, blank=True, null=True
     )
     frame_selection = models.OneToOneField(
-        "Frame", on_delete=models.SET_NULL, blank=True, null=True
+        "Frame", on_delete=models.CASCADE, blank=True, null=True
     )
-    remark_selection= models.OneToOneField(
-        "Remarks", on_delete=models.SET_NULL, blank=True, null=True,related_name="doors"
+    remark_selection = models.OneToOneField(
+        "Remarks", on_delete=models.CASCADE, blank=True, null=True, related_name="doors"
     )
     model_selection = models.OneToOneField(
-        "DoorModel",
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
+        "DoorModel", on_delete=models.CASCADE, blank=True, null=True,
         related_name="model_selection",
     )
     glass_type_selection = models.OneToOneField(
-        "GlassType",
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
+        "GlassType", on_delete=models.CASCADE, blank=True, null=True,
         related_name="glass_type_selection",
     )
     primary_colour_selection = models.OneToOneField(
-        "PrimaryColour",
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
+        "PrimaryColour", on_delete=models.CASCADE, blank=True, null=True,
         related_name="primary_colour_selection",
     )
     secondary_colour_selection = models.OneToOneField(
-        "SecondaryColour",
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
+        "SecondaryColour", on_delete=models.CASCADE, blank=True, null=True,
         related_name="secondary_colour_selection",
     )
     finished = models.BooleanField(default=False)
