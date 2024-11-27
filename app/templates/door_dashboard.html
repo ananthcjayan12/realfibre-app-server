@@ -29,6 +29,17 @@
                 <div class="card-body">
                     <h4 class="card-title mb-4" style="color: #0056b3;">Filter Options</h4>
                     <form method="get">
+                        <!-- Add search box at the top of filters -->
+                        <div class="form-group mb-3">
+                            <label for="search">Search:</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="search" 
+                                   name="search" 
+                                   placeholder="Search by name or ID..."
+                                   value="{{ request.GET.search|default:'' }}">
+                        </div>
+
                         <!-- Filter by Finished -->
                         <p>
                             <label for="finished">Finished:</label><br>
@@ -93,6 +104,53 @@
                     
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <p class="text-muted">
+                Showing {{ showing_start }} to {{ showing_end }} of {{ total_doors }} doors
+            </p>
+        </div>
+        <div class="col-md-6">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-end">
+                    {% if doors.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.finished %}finished={{ request.GET.finished }}&{% endif %}{% if request.GET.glass_selected %}glass_selected={{ request.GET.glass_selected }}&{% endif %}{% if request.GET.door_without_clearance %}door_without_clearance={{ request.GET.door_without_clearance }}&{% endif %}page=1" aria-label="First">
+                                <span aria-hidden="true">&laquo;&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.finished %}finished={{ request.GET.finished }}&{% endif %}{% if request.GET.glass_selected %}glass_selected={{ request.GET.glass_selected }}&{% endif %}{% if request.GET.door_without_clearance %}door_without_clearance={{ request.GET.door_without_clearance }}&{% endif %}page={{ doors.previous_page_number }}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% for page_num in page_range %}
+                        <li class="page-item {% if page_num == doors.number %}active{% endif %}">
+                            <a class="page-link" href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.finished %}finished={{ request.GET.finished }}&{% endif %}{% if request.GET.glass_selected %}glass_selected={{ request.GET.glass_selected }}&{% endif %}{% if request.GET.door_without_clearance %}door_without_clearance={{ request.GET.door_without_clearance }}&{% endif %}page={{ page_num }}">
+                                {{ page_num }}
+                            </a>
+                        </li>
+                    {% endfor %}
+
+                    {% if doors.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.finished %}finished={{ request.GET.finished }}&{% endif %}{% if request.GET.glass_selected %}glass_selected={{ request.GET.glass_selected }}&{% endif %}{% if request.GET.door_without_clearance %}door_without_clearance={{ request.GET.door_without_clearance }}&{% endif %}page={{ doors.next_page_number }}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.finished %}finished={{ request.GET.finished }}&{% endif %}{% if request.GET.glass_selected %}glass_selected={{ request.GET.glass_selected }}&{% endif %}{% if request.GET.door_without_clearance %}door_without_clearance={{ request.GET.door_without_clearance }}&{% endif %}page={{ doors.paginator.num_pages }}" aria-label="Last">
+                                <span aria-hidden="true">&raquo;&raquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
         </div>
     </div>
 </div>

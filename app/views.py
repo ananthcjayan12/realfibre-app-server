@@ -9,6 +9,8 @@ from django.urls import reverse_lazy
 from django.contrib.auth.views import LoginView
 from django.templatetags.static import static
 from django.conf import settings
+from django.db.models import Q
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 FRAME_ADJUSTMENTS = {
     'Small': (-7.3, -7.3, -4.3),
@@ -662,42 +664,113 @@ def door_batch_dashboard(request):
 
 
 def doorwise_dashboard(request):
-    context = {}
-    all_doors = Door.objects.filter(customer__form_complete=True)
-
-    # If no filters, show all doors
-    context['filter'] = "All Doors"
+    # Start with all doors and sort by due date
+    doors = Door.objects.filter(customer__form_complete=True).order_by('customer__delivery_date')
     
-    # Check for 'finished' filter
-    if request.GET.get('finished') is not None:
-        status = request.GET.get('finished').lower() == 'true'
-        all_doors = all_doors.filter(finished=status)
-        context['filter'] += f", Finished: {status}"
+    # Handle database filters first
+    finished = request.GET.get('finished')
+    if finished:
+        doors = doors.filter(finished=finished == 'true')
 
-    # Check for 'glass_selected' filter
-    if request.GET.get('glass_selected'):
-        all_doors = all_doors.filter(glass_type_selection__isnull=False)
-        context['filter'] += ", Doors with Glass Selection"
-    
-     # Check for 'door_without_clearance' filter
-    if 'door_without_clearance' in request.GET:
-        all_doors = all_doors.filter(frame_selection__type="Door Without Clearence")
-        context['filter'] += ", Doors with 'Door Without Clearance' Frame"
+    glass_selected = request.GET.get('glass_selected')
+    if glass_selected:
+        doors = doors.filter(glass_type_selection__isnull=False)
 
-    # Check for 'delivery_date' filter
-    if request.GET.get('delivery_date'):
-        date_filter = request.GET.get('delivery_date')
-        all_doors = all_doors.filter(customer__delivery_date=date_filter)
-        context['filter'] += f", Delivery Date: {date_filter}"
+    door_without_clearance = request.GET.get('door_without_clearance')
+    if door_without_clearance:
+        doors = doors.filter(frame_selection__type='Door Without Clearence')
 
-    door_ids = list(all_doors.values_list('id', flat=True))
+    # Get search query from request
+    search_query = request.GET.get('search', '')
+    if search_query:
+        # Split the search query in case it's a SL NO format (id/order_number)
+        sl_no_parts = search_query.split('/')
+        
+        # Build the base query
+        query = Q(customer__name__icontains=search_query) | \
+                Q(customer__id__icontains=search_query) | \
+                Q(model_selection__model_name__icontains=search_query)
+        
+        # Add customer ID search if it's in SL NO format
+        if len(sl_no_parts) == 2:
+            try:
+                customer_id = int(sl_no_parts[0])
+                query |= Q(customer__id=customer_id)
+            except ValueError:
+                pass
+        else:
+            query |= Q(customer__id__icontains=search_query)
+        
+        doors = doors.filter(query)
+        
+        # After all database filters, convert to list for Python filtering
+        doors = list(doors)
+        
+        # If searching for a specific SL NO format, filter by order number in Python
+        if len(sl_no_parts) == 2:
+            try:
+                order_number = int(sl_no_parts[1])
+                doors = [door for door in doors if door.get_order_number() == order_number]
+            except ValueError:
+                pass
+    else:
+        # If no search query, convert to list after all filters
+        doors = list(doors)
+
+    # Create filter description
+    filter_description = []
+    if search_query:
+        filter_description.append(f"Search: {search_query}")
+    if finished:
+        filter_description.append(f"Finished: {'Yes' if finished == 'true' else 'No'}")
+    if glass_selected:
+        filter_description.append("Has Glass Selection")
+    if door_without_clearance:
+        filter_description.append("Door Without Clearance Frame")
+
+    filter_text = ", ".join(filter_description) if filter_description else "None"
+
+    # Store all filtered door IDs in session before pagination
+    door_ids = [door.id for door in doors]
     request.session['filtered_doors'] = door_ids
 
+    # Pagination
+    page = request.GET.get('page', 1)
+    items_per_page = 10  # You can adjust this number
+    paginator = Paginator(doors, items_per_page)
+    
+    try:
+        doors_page = paginator.page(page)
+    except PageNotAnInteger:
+        doors_page = paginator.page(1)
+    except EmptyPage:
+        doors_page = paginator.page(paginator.num_pages)
 
-    context['doors'] = all_doors
+    # Calculate page ranges for pagination display
+    page_range = get_page_range(paginator, doors_page.number)
 
+    context = {
+        'doors': doors_page,
+        'filter': filter_text,
+        'page_range': page_range,
+        'total_doors': len(doors),
+        'showing_start': (doors_page.number - 1) * items_per_page + 1,
+        'showing_end': min(doors_page.number * items_per_page, len(doors)),
+    }
     return render(request, 'door_dashboard.html', context)
 
+def get_page_range(paginator, current_page, show_pages=5):
+    """Helper function to calculate pagination range"""
+    middle = show_pages // 2
+    if paginator.num_pages <= show_pages:
+        return range(1, paginator.num_pages + 1)
+    
+    if current_page <= middle + 1:
+        return range(1, show_pages + 1)
+    elif current_page >= paginator.num_pages - middle:
+        return range(paginator.num_pages - show_pages + 1, paginator.num_pages + 1)
+    else:
+        return range(current_page - middle, current_page + middle + 1)
 
 def print_pdf(request,session_name):
     door_ids = request.session.get(session_name, [])
