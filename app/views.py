@@ -11,6 +11,7 @@ from django.templatetags.static import static
 from django.conf import settings
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.utils import timezone
 
 FRAME_ADJUSTMENTS = {
     'Small': (-7.3, -7.3, -4.3),
@@ -34,17 +35,15 @@ def home(request):
     if request.method == 'POST':
         form = CustomerForm(request.POST)
         if form.is_valid():
-            customer = form.save(commit=False)  # Temporarily prevent saving
-            customer.agent = request.user  # Assign the logged-in user to the agent field
+            customer = form.save(commit=False)
+            customer.agent = request.user
+            customer.order_date = timezone.now().date()
             customer.save()
-            return redirect('home')  # Redirect back to the home after saving
-
+            return redirect('home')
     else:
         form = CustomerForm()
         query = request.GET.get('search', '')
-        print(request.user)
         customers = Customer.objects.filter(agent=request.user, name__icontains=query).order_by('-id')[:10]
-
 
     return render(request, 'home.html', {'customers': customers, 'form': form})
 
@@ -454,59 +453,71 @@ def door_and_glass_selector_view(request, door_id):
         primary_color_name = request.POST.get('primarycolour')
         secondary_color_name = request.POST.get('secondarycolour')
         glass_type_name = request.POST.get('glasstype')
+        other_door_name = request.POST.get('other_door')  # New field
+        other_glass_name = request.POST.get('other_glass')  # New field
 
+        # Handle door model selection
+        if door_model_name == 'other':
+            if other_door_name:  # Use the custom door name if provided
+                door_model_name = other_door_name
+        
         if door_model_name:
             door_model_instance, created = DoorModel.objects.get_or_create(model_name=door_model_name, door=door_instance)
             door_instance.model_selection = door_model_instance
-        else :
+        else:
             door_instance.model_selection = None
 
-        if primary_color_name:
-            primary_color_instance, created = PrimaryColour.objects.get_or_create(color_name=primary_color_name, door=door_instance)
-            door_instance.primary_colour_selection = primary_color_instance
-        else :
-            door_instance.primary_colour_selection = None
-
-
-        if secondary_color_name:
-            secondary_color_instance, created = SecondaryColour.objects.get_or_create(color_name=secondary_color_name, door=door_instance)
-            door_instance.secondary_colour_selection = secondary_color_instance
-        else :
-            door_instance.secondary_colour_selection = None
+        # Handle glass type selection
+        if glass_type_name == 'other':
+            if other_glass_name:  # Use the custom glass name if provided
+                glass_type_name = other_glass_name
 
         if glass_type_name:
             glass_type_instance, created = GlassType.objects.get_or_create(glass_name=glass_type_name, door=door_instance)
             door_instance.glass_type_selection = glass_type_instance
-        else :
+        else:
             door_instance.glass_type_selection = None
 
+        if primary_color_name:
+            primary_color_instance, created = PrimaryColour.objects.get_or_create(color_name=primary_color_name, door=door_instance)
+            door_instance.primary_colour_selection = primary_color_instance
+        else:
+            door_instance.primary_colour_selection = None
+
+        if secondary_color_name:
+            secondary_color_instance, created = SecondaryColour.objects.get_or_create(color_name=secondary_color_name, door=door_instance)
+            door_instance.secondary_colour_selection = secondary_color_instance
+        else:
+            door_instance.secondary_colour_selection = None
+
         door_instance.save()
-        return redirect('select_hinge', door_id=door_instance.id)  # Redirect back to the process selection
+        return redirect('select_hinge', door_id=door_instance.id)
 
-
-    # List of door names (extracted from your image filenames)
+    # List of door names
     doors = [
         "orbit", "petra", "triangle", "astonia", "cloud", "delta", "flora", "hexa", 
         "horizon", "liva", "mars", "milton", "narrow", "periyar", "rectaglass", 
         "regal", "regency", "richmond", "rivera", "simplon", "skill", "spasio", 
         "vector", "venues", "vetrix", "wayanad", "wexco", "wexcoglass", "venuesglass",
-        "plainglass", "classic", "galaxy", "queen" , "royal"# Added the three new doors
+        "plainglass", "classic", "galaxy", "queen", "royal", "dynamic", "spider", "other"  # Added new options
     ]
 
     # Dictionary mapping doors to their associated glasses
     door_glass_mapping = {
-    "delta": ["EL01", "EL02", "EL03", "EL04", "EL05", "EL06", "EL07", "EL08", "EL09", "EL10"],
-    "cloud": [f"PY{i:02}" for i in range(1, 13)],  # PY01 to PY12
-    "simplon": [f"PK{i:02}" for i in range(1, 11)],  # PK01 to PK10
-    "hexa": [f"XA{i:02}" for i in range(1, 10)],  # XA01 to XA09
-    "wexcoglass": [f"GL{i:02}" for i in range(1, 11)],  # GL01 to GL10
-    "rectaglass": [f"GL{i:02}" for i in range(1, 21)],  # GL11 to GL20
-    "vector": [f"TR{i:02}" for i in range(1, 11)],  # TR01 to TR10
-    "horizon": [f"RZ{i:02}" for i in range(1, 13)],  # RZ01 to RZ12
-    "astonia": [f"TB{i:02}" for i in range(1, 11)],  # TB01 to TB10
-    "liva": [f"AV{i:02}" for i in range(1, 12)],  # AV01 to AV11
-    "venuesglass": [f"V{i:02}" for i in range(1, 10)]  # V01 to V09
-}
+        "delta": ["EL01", "EL02", "EL03", "EL04", "EL05", "EL06", "EL07", "EL08", "EL09", "EL10", "other"],
+        "cloud": [f"PY{i:02}" for i in range(1, 13)] + ["other"],
+        "simplon": [f"PK{i:02}" for i in range(1, 11)] + ["other"],
+        "hexa": [f"XA{i:02}" for i in range(1, 10)] + ["other"],
+        "wexcoglass": [f"GL{i:02}" for i in range(1, 11)] + ["other"],
+        "rectaglass": [f"GL{i:02}" for i in range(1, 21)] + ["other"],
+        "vector": [f"TR{i:02}" for i in range(1, 11)] + ["other"],
+        "horizon": [f"RZ{i:02}" for i in range(1, 13)] + ["other"],
+        "astonia": [f"TB{i:02}" for i in range(1, 11)] + ["other"],
+        "liva": [f"AV{i:02}" for i in range(1, 12)] + ["other"],
+        "venuesglass": [f"V{i:02}" for i in range(1, 10)] + ["other"],
+        "other": ["other"]  # For custom door types
+    }
+
     colors = [
         "black", "darkgrey", "eeti", "leatherfinish", "lightgrey", "mahagani",
         "teakwooddark", "teakwoodlight", "white", "coffee", "offwhite", "ivory"

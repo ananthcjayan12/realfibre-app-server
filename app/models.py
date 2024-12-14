@@ -1,5 +1,5 @@
 from django.db import models
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import json
 import traceback
 from django.utils import timezone
@@ -46,6 +46,51 @@ class Customer(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        print("going to save")
+        if not self.id:  # Only for new customers
+            print("new customer")
+            cutoff_date = datetime(2024, 12, 14).date()  # Hardcoded today's date
+
+            
+            # Set order_date to today if not provided
+            if not self.order_date:
+                self.order_date = timezone.now().date()
+            
+            if self.order_date >= cutoff_date:
+                print("order date is greater than cutoff date")
+                # Get the latest customer ID for orders from cutoff date onwards
+                latest_customer = Customer.objects.filter(
+                    order_date__gte=cutoff_date
+                ).order_by('-id').first()
+
+                if latest_customer:
+                    print("latest customer is there")
+                    # Extract the numeric part of the ID
+                    try:
+                        last_id = int(str(latest_customer.id).rstrip('A'))
+                        print("last id is ", last_id)
+                        self.id = last_id + 1
+                    except ValueError:
+                        # If there was an 'A' suffix, increment the base number
+                        base_id = int(str(latest_customer.id)[:-1])
+                        self.id = base_id + 1
+                else:
+                    # First customer after cutoff date
+                    self.id = 1
+
+                # Check for ID conflict
+                while Customer.objects.filter(id=self.id).exists():
+                    if isinstance(self.id, str) and self.id.endswith('A'):
+                        # If already has 'A', increment the base number
+                        base_id = int(self.id[:-1])
+                        self.id = str(base_id + 1) + 'A'
+                    else:
+                        # Add 'A' suffix for conflict resolution
+                        self.id = str(self.id) + 'A'
+
+        super().save(*args, **kwargs)
 
 
 class Door(models.Model):

@@ -181,4 +181,31 @@ document.addEventListener("DOMContentLoaded", function() {
     
 </script>
 
+<div id="other_door_input" style="display: none;" class="mb-3">
+    <label for="other_door">Specify Door Type:</label>
+    <input type="text" id="other_door" name="other_door" class="form-control">
+</div>
+
+<div id="other_glass_input" style="display: none;" class="mb-3">
+    <label for="other_glass">Specify Glass Type:</label>
+    <input type="text" id="other_glass" name="other_glass" class="form-control">
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const doorSelect = document.getElementById('doormodel');
+    const glassSelect = document.getElementById('glasstype');
+    const otherDoorInput = document.getElementById('other_door_input');
+    const otherGlassInput = document.getElementById('other_glass_input');
+
+    doorSelect.addEventListener('change', function() {
+        otherDoorInput.style.display = this.value === 'other' ? 'block' : 'none';
+    });
+
+    glassSelect.addEventListener('change', function() {
+        otherGlassInput.style.display = this.value === 'other' ? 'block' : 'none';
+    });
+});
+</script>
+
 {% endblock %}
