@@ -45,9 +45,13 @@ def home(request):
         query = request.GET.get('search', '')
         if query:
             customers = Customer.objects.filter(
-                agent=request.user, 
-                name__icontains=query
-            ).order_by('-order_date')[:5]
+                agent=request.user
+            ).filter(
+                Q(name__icontains=query) |
+                Q(location__icontains=query) |
+                Q(phone_number__icontains=query) |
+                Q(doors__model_selection__model_name__icontains=query)
+            ).distinct().order_by('-order_date')[:5]
         else:
             customers = Customer.objects.filter(
                 agent=request.user
