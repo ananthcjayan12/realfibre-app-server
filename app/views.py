@@ -54,21 +54,20 @@ def home(request):
                 Q(location__icontains=query) |
                 Q(phone_number__icontains=query) |
                 Q(doors__model_selection__model_name__icontains=query)
-            ).distinct().order_by('-order_date')
-        else:
-            # Show only latest 5 when no search
-            customers = customers.order_by('-order_date')[:5]
-
-        # Apply pagination only when searching
-        if query:
-            paginator = Paginator(customers, 10)  # Show 10 customers per page
-            page = request.GET.get('page')
-            try:
-                customers = paginator.page(page)
-            except PageNotAnInteger:
-                customers = paginator.page(1)
-            except EmptyPage:
-                customers = paginator.page(paginator.num_pages)
+            ).distinct()
+        
+        # Always order by order date
+        customers = customers.order_by('-order_date')
+        
+        # Always apply pagination
+        paginator = Paginator(customers, 10)  # Show 10 customers per page
+        page = request.GET.get('page')
+        try:
+            customers = paginator.page(page)
+        except PageNotAnInteger:
+            customers = paginator.page(1)
+        except EmptyPage:
+            customers = paginator.page(paginator.num_pages)
         
     context = {
         'customers': customers,
