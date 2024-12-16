@@ -13,20 +13,31 @@
         <div class="card-body">
             <form method="get">
                 <div class="input-group">
-                    <input type="text" name="search" class="form-control" placeholder="Search customer...">
+                    <input type="text" name="search" class="form-control" placeholder="Search customer..." value="{{ query }}">
                     <div class="input-group-append">
                         <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
+                        {% if query %}
+                            <a href="{% url 'home' %}" class="btn btn-secondary">Clear</a>
+                        {% endif %}
                     </div>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Latest Customers -->
+    <!-- Customers List -->
     <div class="card mb-3">
         <div class="card-header">
-            <i class="fa fa-users"></i> Latest Customers
-            <small class="text-muted">(Last 5 orders)</small>
+            <i class="fa fa-users"></i> 
+            {% if is_search %}
+                Search Results
+                {% if customers.paginator %}
+                    <small class="text-muted">({{ customers.paginator.count }} results)</small>
+                {% endif %}
+            {% else %}
+                Latest Customers
+                <small class="text-muted">(Last 5 orders)</small>
+            {% endif %}
         </div>
         <ul class="list-group list-group-flush">
             {% for customer in customers %}
@@ -45,6 +56,39 @@
             {% endfor %}
         </ul>
     </div>
+
+    <!-- Pagination -->
+    {% if is_search and customers.paginator %}
+    <div class="d-flex justify-content-center mb-3">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if customers.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?search={{ query }}&page=1">&laquo; First</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?search={{ query }}&page={{ customers.previous_page_number }}">Previous</a>
+                    </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">
+                        Page {{ customers.number }} of {{ customers.paginator.num_pages }}
+                    </span>
+                </li>
+
+                {% if customers.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?search={{ query }}&page={{ customers.next_page_number }}">Next</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?search={{ query }}&page={{ customers.paginator.num_pages }}">Last &raquo;</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
 
     <!-- Add New Customer -->
     <div class="card">

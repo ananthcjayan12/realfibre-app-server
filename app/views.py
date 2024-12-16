@@ -43,21 +43,40 @@ def home(request):
     else:
         form = CustomerForm()
         query = request.GET.get('search', '')
+        
+        # Base queryset
+        customers = Customer.objects.filter(agent=request.user)
+        
         if query:
-            customers = Customer.objects.filter(
-                agent=request.user
-            ).filter(
+            # Search entire database when query exists
+            customers = customers.filter(
                 Q(name__icontains=query) |
                 Q(location__icontains=query) |
                 Q(phone_number__icontains=query) |
                 Q(doors__model_selection__model_name__icontains=query)
-            ).distinct().order_by('-order_date')[:5]
+            ).distinct().order_by('-order_date')
         else:
-            customers = Customer.objects.filter(
-                agent=request.user
-            ).order_by('-order_date')[:5]
+            # Show only latest 5 when no search
+            customers = customers.order_by('-order_date')[:5]
 
-    return render(request, 'home.html', {'customers': customers, 'form': form})
+        # Apply pagination only when searching
+        if query:
+            paginator = Paginator(customers, 10)  # Show 10 customers per page
+            page = request.GET.get('page')
+            try:
+                customers = paginator.page(page)
+            except PageNotAnInteger:
+                customers = paginator.page(1)
+            except EmptyPage:
+                customers = paginator.page(paginator.num_pages)
+        
+    context = {
+        'customers': customers,
+        'form': form,
+        'query': query,
+        'is_search': bool(query)
+    }
+    return render(request, 'home.html', context)
 
 
 
