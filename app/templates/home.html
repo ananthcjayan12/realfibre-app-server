@@ -22,18 +22,25 @@
         </div>
     </div>
 
-    <!-- Existing Customers -->
+    <!-- Latest Customers -->
     <div class="card mb-3">
         <div class="card-header">
-            <i class="fa fa-users"></i> Existing Customers
+            <i class="fa fa-users"></i> Latest Customers
+            <small class="text-muted">(Last 5 orders)</small>
         </div>
         <ul class="list-group list-group-flush">
             {% for customer in customers %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <span>
                     <strong>{{ customer.name }}</strong> - {{ customer.location }}
+                    <br>
+                    <small class="text-muted">Order Date: {{ customer.order_date|date:"d M Y" }}</small>
                 </span>
                 <a href="{% url 'door_selection' customer.id %}" class="btn btn-primary btn-sm">Doors <i class="fa fa-arrow-right"></i></a>
+            </li>
+            {% empty %}
+            <li class="list-group-item text-center text-muted">
+                No customers found
             </li>
             {% endfor %}
         </ul>
@@ -66,7 +73,7 @@
                     <input type="tel" class="form-control" id="{{ form.phone_number.id_for_label }}" name="{{ form.phone_number.name }}" placeholder="Enter phone number">
                 </div>
     
-                <!-- Google Location Field (assuming it's a URL field) -->
+                <!-- Google Location Field -->
                 <div class="form-group">
                     <label for="{{ form.google_location.id_for_label }}">Google Location:</label>
                     <input type="url" class="form-control" id="{{ form.google_location.id_for_label }}" name="{{ form.google_location.name }}" placeholder="Enter Google Maps link">

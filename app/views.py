@@ -43,7 +43,15 @@ def home(request):
     else:
         form = CustomerForm()
         query = request.GET.get('search', '')
-        customers = Customer.objects.filter(agent=request.user, name__icontains=query).order_by('-id')[:10]
+        if query:
+            customers = Customer.objects.filter(
+                agent=request.user, 
+                name__icontains=query
+            ).order_by('-order_date')[:5]
+        else:
+            customers = Customer.objects.filter(
+                agent=request.user
+            ).order_by('-order_date')[:5]
 
     return render(request, 'home.html', {'customers': customers, 'form': form})
 
