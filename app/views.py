@@ -15,7 +15,7 @@ from django.utils import timezone
 
 FRAME_ADJUSTMENTS = {
     'Small': (-7.3, -7.3, -4.3),
-    'Normal': (-8.0, -8.0, -4.8),
+    'Normal': (-8.2, -8.2, -4.8),
     'Medium': (-7.3, -7.3, -4.3),
     'Heavy': (-11, -11, -6.3),
     'Door Without Clearence': (0, 0, 0),
