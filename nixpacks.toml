@@ -1,0 +1,8 @@
+# Nixpacks configuration to install system dependencies for ReportLab
+[phases.setup]
+aptPkgs = [
+  "libfreetype6-dev",
+  "libjpeg-dev",
+  "zlib1g-dev",
+  "pkg-config"
+] 
