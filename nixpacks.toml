@@ -1,4 +1,7 @@
 # Nixpacks configuration to install system dependencies for ReportLab
+[languages.python]
+version = "3.11"
+
 [phases.setup]
 aptPkgs = [
   "libfreetype6-dev",
