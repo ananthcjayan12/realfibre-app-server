@@ -564,6 +564,7 @@ def door_and_glass_selector_view(request, door_id):
 
     context = {
         "doors": doors,
+        "door_options": DOOR_MODEL_CHOICES,
         "door_labels": door_labels,
         "door_glass_mapping": door_glass_mapping,
         "door_images_json": json.dumps(door_images_js),
@@ -571,6 +572,7 @@ def door_and_glass_selector_view(request, door_id):
         "colors_mapping_json": json.dumps(color_images_js),
         "default_colour_mapping_json": json.dumps(DEFAULT_COLOUR_BY_MODEL),
         "colors": colors,
+        "color_options": COLOUR_CHOICES,
         "color_labels": color_labels,
         "door_instance": door_instance,
         "current_door_model": current_door_model,
