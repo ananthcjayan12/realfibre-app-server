@@ -67,7 +67,7 @@ class LockForm(forms.ModelForm):
         return cleaned_data
 
 class FinishForm(forms.ModelForm):
-    FINISH_CHOICES = [('std', 'Std'), ('natural_wood', 'Natural Wood'), ('glossy', 'Glossy')]
+    FINISH_CHOICES = [('std', 'STD'), ('std_grains', 'STD Grains'), ('natural_wood', 'Natural Wood'), ('glossy', 'Glossy')]
     front = forms.ChoiceField(choices=FINISH_CHOICES)
     back = forms.ChoiceField(choices=FINISH_CHOICES)
 
