@@ -12,15 +12,12 @@ from django.conf import settings
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils import timezone
-
-FRAME_ADJUSTMENTS = {
-    'Small': (-7.3, -7.3, -4.3),
-    'Normal': (-8.2, -8.2, -4.8),
-    'Medium': (-7.3, -7.3, -4.3),
-    'Heavy': (-11, -11, -6.3),
-    'Door Without Clearence': (0, 0, 0),
-    'Door With Clearence': (-0.7, -0.7, -0.8)
-}
+from .catalog_config import (
+    DOOR_MODEL_CHOICES,
+    COLOUR_CHOICES,
+    DEFAULT_COLOUR_BY_MODEL,
+    calculate_frame_measurements,
+)
 
 class CustomLoginView(LoginView):
     template_name = 'login.html'
@@ -301,11 +298,14 @@ def frame_selection(request, door_id):
         form = FrameForm(request.POST, instance=instance)
         if form.is_valid():
             frame = form.save(commit=False)
-            adjustment = FRAME_ADJUSTMENTS.get(frame.type)
-            if adjustment:
-                frame.top_measurement = round(door.measurement.top + adjustment[0], 2)
-                frame.breadth_measurement = round(door.measurement.bottom + adjustment[1], 2)
-                frame.height_measurement = round(door.measurement.height + adjustment[2], 2)
+            measurements = calculate_frame_measurements(
+                frame.type,
+                door.measurement.top,
+                door.measurement.bottom,
+                door.measurement.height,
+            )
+            if measurements:
+                frame.top_measurement, frame.breadth_measurement, frame.height_measurement = measurements
 
             
             frame.save()
@@ -523,16 +523,12 @@ def door_and_glass_selector_view(request, door_id):
         door_instance.save()
         return redirect('select_hinge', door_id=door_instance.id)
 
-    # List of door names
-    doors = [
-        "orbit", "petra", "triangle", "astonia", "cloud", "delta", "flora", "hexa", 
-        "horizon", "liva", "mars", "milton", "narrow", "periyar", "rectaglass", 
-        "regal", "regency", "richmond", "rivera", "simplon", "skill", "spasio", 
-        "vector", "venues", "vetrix", "wayanad", "wexco", "wexcoglass", "venuesglass",
-        "plainglass", "classic", "galaxy", "queen", "royal", "dynamic", "spider", "other"  # Added new options
-    ]
+    # Door and colour catalogue values are centralized in catalog_config.py.
+    doors = [value for value, _label in DOOR_MODEL_CHOICES]
+    door_labels = dict(DOOR_MODEL_CHOICES)
+    colors = [value for value, _label in COLOUR_CHOICES]
+    color_labels = dict(COLOUR_CHOICES)
 
-    # Dictionary mapping doors to their associated glasses
     door_glass_mapping = {
         "delta": ["EL01", "EL02", "EL03", "EL04", "EL05", "EL06", "EL07", "EL08", "EL09", "EL10", "other"],
         "cloud": [f"PY{i:02}" for i in range(1, 13)] + ["other"],
@@ -545,52 +541,45 @@ def door_and_glass_selector_view(request, door_id):
         "astonia": [f"TB{i:02}" for i in range(1, 11)] + ["other"],
         "liva": [f"AV{i:02}" for i in range(1, 12)] + ["other"],
         "venuesglass": [f"V{i:02}" for i in range(1, 10)] + ["other"],
-        "other": ["other"]  # For custom door types
+        "other": ["other"],
     }
 
-    colors = [
-        "black", "darkgrey", "eeti", "leatherfinish", "lightgrey", "mahagani",
-        "teakwooddark", "teakwoodlight", "white", "coffee", "offwhite", "ivory"
-    ]
+    door_images_js = {
+        door: ("" if door == "other" else f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/doors/{door}.png")
+        for door in doors
+    }
+    door_glass_mapping_js = {
+        door: [f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/glass/{glass}.png" for glass in glasses]
+        for door, glasses in door_glass_mapping.items()
+    }
+    color_images_js = {
+        color: f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/colours/{color}.png"
+        for color in colors
+    }
 
-
-    # Create the media paths for door images and their respective glasses
-    door_images_js = {door: f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/doors/{door}.png" for door in doors}
-    door_glass_mapping_js = {door: [f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/glass/{glass}.png" for glass in glasses] 
-                            for door, glasses in door_glass_mapping.items()}
-    
-    # Update color images to use AWS_S3_CUSTOM_DOMAIN
-    color_images_js = {color: f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/colours/{color}.png" for color in colors}
-    
-    door_images_json = json.dumps(door_images_js)
-    door_glass_mapping_json = json.dumps(door_glass_mapping_js) 
-    colors = [
-        "black", "darkgrey", "eeti", "leatherfinish", "lightgrey", "mahagani",
-        "teakwooddark", "teakwoodlight", "white", "coffee", "offwhite", "ivory"
-    ]
-    color_images_js = {color: static(f'colours/{color}.png') for color in colors}
-    colors_mapping_json = json.dumps(color_images_js)
     current_door_model = door_instance.model_selection.model_name if door_instance.model_selection else None
     current_primary_color = door_instance.primary_colour_selection.color_name if door_instance.primary_colour_selection else None
     current_secondary_color = door_instance.secondary_colour_selection.color_name if door_instance.secondary_colour_selection else None
     current_glass_type = door_instance.glass_type_selection.glass_name if door_instance.glass_type_selection else None
 
-
-
     context = {
-        'doors': doors,
-        'door_glass_mapping': door_glass_mapping,
-        'door_images_json': door_images_json,
-        'door_glass_mapping_json': door_glass_mapping_json,
-        'colors_mapping_json': colors_mapping_json,
-       'colors' :colors,
-       'door_instance':door_instance,
-       'current_door_model': current_door_model,
-        'current_primary_color': current_primary_color,
-        'current_secondary_color': current_secondary_color,
-        'current_glass_type': current_glass_type,
-               } 
-    
+        "doors": doors,
+        "door_options": DOOR_MODEL_CHOICES,
+        "door_labels": door_labels,
+        "door_glass_mapping": door_glass_mapping,
+        "door_images_json": json.dumps(door_images_js),
+        "door_glass_mapping_json": json.dumps(door_glass_mapping_js),
+        "colors_mapping_json": json.dumps(color_images_js),
+        "default_colour_mapping_json": json.dumps(DEFAULT_COLOUR_BY_MODEL),
+        "colors": colors,
+        "color_options": COLOUR_CHOICES,
+        "color_labels": color_labels,
+        "door_instance": door_instance,
+        "current_door_model": current_door_model,
+        "current_primary_color": current_primary_color,
+        "current_secondary_color": current_secondary_color,
+        "current_glass_type": current_glass_type,
+    }
 
     return render(request, 'doorglass1.html', context)
 
