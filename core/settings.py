@@ -29,10 +29,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-xf7&gz7asn5s8%v$woe!pm3xmrv#%$bmxkqc5o%t15vzfu8lxy"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DJANGO_DEBUG', 'true').lower() == 'true'
 
 ALLOWED_HOSTS = ['realfibreglass.srshti.co.in','127.0.0.1','realfibre.srshti.co.in','s4wokksok84048kcwkossc8c.82.112.235.216.sslip.io','y8ksgok0k4so4osk8gg8cg00.82.112.235.216.sslip.io']
 CSRF_TRUSTED_ORIGINS = ['https://realfibreglass.srshti.co.in','https://realfibre.srshti.co.in','http://s4wokksok84048kcwkossc8c.82.112.235.216.sslip.io','http://y8ksgok0k4so4osk8gg8cg00.82.112.235.216.sslip.io/']
+ALLOWED_HOSTS += [host.strip() for host in os.getenv('DJANGO_ALLOWED_HOSTS', '').split(',') if host.strip()]
+CSRF_TRUSTED_ORIGINS += [origin.strip() for origin in os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',') if origin.strip()]
 LOGIN_URL = 'agent_login'  # Assuming 'agent_login' is the name of your login view in urls.py
 LOGOUT_REDIRECT_URL = 'agent_login'  # Redirect to login page after logout for this example
 
@@ -87,7 +89,7 @@ WSGI_APPLICATION = "core.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "NAME": os.getenv('SQLITE_PATH', str(BASE_DIR / 'db.sqlite3')),
     }
 }
 
@@ -132,6 +134,9 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 # Media files configuration for R2
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+R2_UPLOAD_PREFIX = os.getenv('R2_UPLOAD_PREFIX', '').strip('/')
+if R2_UPLOAD_PREFIX:
+    DEFAULT_FILE_STORAGE = 'core.storage.StagingMediaStorage'
 
 # R2 credentials and configuration
 AWS_ACCESS_KEY_ID = os.getenv('R2_ACCESS_KEY_ID')
